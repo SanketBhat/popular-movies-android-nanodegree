@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Pop Moviez</string>
+
+    <!--Image description-->
+    <string name="list_item_image_desc">Movie poster</string>
+    <string name="movie_detail_movie_poster_description">Movie poster</string>
+    <string name="movie_list_error_layout_image_description">Error image</string>
+
+    <!--Movie detail-->
+    <string name="title_movie_detail">Movie Detail</string>
+    <string name="movie_detail_date_error">Not available</string>
+    <string name="movie_detail_backdrop_image_description">Backdrop image</string>
+    <string name="movie_detail_release_date_label">Release Date :</string>
+    <string name="movie_detail_average_rating_label">Average rating</string>
+    <string name="movie_detail_plot_label">Plot</string>
+
+    <!--Movie List-->
+    <string name="movie_list_error_layout_error_message">Oops, An error occurred!</string>
+    <string name="movie_list_error_layout_retry_button_label">Retry</string>
+    <string name="movie_grid_item_loading_indicator_text">Loading more movies…</string>
+
+    <!--Menu-->
+    <string name="menu_main_action_sort">Sort</string>
+    <string name="menu_main_option_popular_movies">Most Popular</string>
+    <string name="menu_main_option_top_rated">Highest Rated</string>
+</resources>
