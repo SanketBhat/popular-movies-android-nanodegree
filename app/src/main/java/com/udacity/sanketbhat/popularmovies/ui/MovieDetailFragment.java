@@ -29,7 +29,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.util.MovieUrlBuilder;
+import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,7 +80,7 @@ public class MovieDetailFragment extends Fragment {
         TextView ratingText = rootView.findViewById(R.id.movieDetailRatingText);
         if (movie != null) {
             Picasso.with(getContext())
-                    .load(MovieUrlBuilder.getPosterUrlString(movie.getPosterPath()))
+                    .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
                     .into(posterImage);
             title.setText(movie.getTitle());
             genre.setText(movie.getGenres());
@@ -96,7 +96,7 @@ public class MovieDetailFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            float rating = (float) movie.getVoteAverage() / 2.0f;
+            float rating = (float) (movie.getVoteAverage() / 2.0f);
             String ratingString = "(" + String.format(Locale.getDefault(), "%.1f", rating) + "/5)";
             ratingText.setText(ratingString);
         }

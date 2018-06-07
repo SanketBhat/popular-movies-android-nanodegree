@@ -21,4 +21,20 @@ public class SortOrder {
     public static final int SORT_ORDER_TOP_RATED = 2;
 
     public static final int SORT_ORDER_DEFAULT = SORT_ORDER_POPULAR;
+
+    private static final String URL_PATH_POPULAR = "popular";
+    private static final String URL_PATH_TOP_RATED = "top_rated";
+
+    public static String getSortOrderPath(int sortOrder) {
+        switch (sortOrder) {
+            case SORT_ORDER_POPULAR:
+                return URL_PATH_POPULAR;
+
+            case SORT_ORDER_TOP_RATED:
+                return URL_PATH_TOP_RATED;
+
+            default:
+                return URL_PATH_POPULAR;
+        }
+    }
 }

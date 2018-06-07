@@ -29,7 +29,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.ui.MovieListActivity;
-import com.udacity.sanketbhat.popularmovies.util.MovieUrlBuilder;
+import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
 import java.util.List;
 
@@ -40,9 +40,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     // -> 2. For the loading indicator at the end.
     public static final int VIEW_TYPE_MOVIE = 1;
     public static final int VIEW_TYPE_PROGRESS = 2;
+
     private final ItemClickListener clickListener;
     private final Context mContext;
     private List<Movie> movies;
+
     //Boolean flag for showing or not showing the loading indicator at the end of the grid.
     private boolean loading = false;
 
@@ -78,7 +80,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                     viewHolder.movieGenre.setText(movies.get(position).getGenres());
                     viewHolder.movieName.setText(movies.get(position).getTitle());
                     Picasso.with(mContext)
-                            .load(MovieUrlBuilder.getPosterUrlString(movies.get(position).getPosterPath()))
+                            .load(ImageUrlBuilder.getPosterUrlString(movies.get(position).getPosterPath()))
                             .tag(MovieListActivity.class)
                             .error(R.drawable.ic_movie_grid_item_image_error)
                             .placeholder(R.drawable.ic_loading_indicator)
@@ -104,13 +106,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         if (movies == null) return 0;
+        else if (loading) return movies.size() + 1;
         else return movies.size();
     }
 
     @Override
     public int getItemViewType(int position) {
         //If loading new page, return last element type as loading indicator
-        if ((position == movies.size() - 1) && isLoading())
+        if ((position == movies.size()) && isLoading())
             return VIEW_TYPE_PROGRESS;
         else
             return VIEW_TYPE_MOVIE;
@@ -123,33 +126,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     public void setLoading(boolean loading) {
         if (this.loading != loading) {
             this.loading = loading;
-
-            //Add or Remove the dummy movie object to fool recyclerView
-            // and show loading indicator in place of that.
-            if (loading) {
-                movies.add(new Movie());
-                notifyItemInserted(movies.size() - 1);
-            } else {
-                movies.remove(movies.size() - 1);
-                notifyItemRemoved(movies.size());
-            }
+            notifyDataSetChanged();
         }
     }
 
     public void swapMovies(List<Movie> movies) {
-        setLoading(false);
         this.movies = movies;
         notifyDataSetChanged();
-    }
-
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    public void addMovies(List<Movie> newMovies) {
-        setLoading(false);
-        movies.addAll(newMovies);
-        notifyItemInserted(movies.size() - 1);
     }
 
     public interface ItemClickListener {
@@ -181,36 +164,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                     .cancelRequest(moviePoster);
             moviePoster.setImageDrawable(null);
         }
-
-        //The following code leaks the imageView context. Finding alternatives.
-        //Picasso library callback
-        /*@Override
-        public void onSuccess() {
-            Palette.from(((BitmapDrawable) moviePoster.getDrawable()).getBitmap()).generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(@NonNull Palette palette) {
-                    final Palette.Swatch swatch = palette.getLightVibrantSwatch();
-                    if (swatch != null) {
-                        new Handler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                cardView.setCardBackgroundColor(swatch.getRgb());
-                                movieName.setTextColor(swatch.getBodyTextColor());
-                                movieGenre.setTextColor(swatch.getTitleTextColor());
-                            }
-                        });
-                    }
-
-
-                }
-            });
-
-        }
-
-        @Override
-        public void onError() {
-
-        }*/
     }
 
     class ProgressViewHolder extends RecyclerView.ViewHolder {

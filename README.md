@@ -12,4 +12,4 @@ This is second project in the Android Developer Nanodegree, Udacity. I created i
 - [The Movie DB API](https://www.themoviedb.org/documentation/api)
 
 ## Before you build
-  This project uses `TheMovieDB API` to fetch the movie name and details. Before you build the project add your `API KEY` to the project
+  This project uses `TheMovieDB API` to fetch the movie name and details. Before you build the project add your `API KEY` to the `gradle.properties` file

@@ -28,7 +28,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.util.MovieUrlBuilder;
+import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
 /**
  * An activity representing a single Movie detail screen. This
@@ -56,7 +56,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (movie != null) {
             ImageView imageView = findViewById(R.id.image_backdrop);
             Picasso.with(this)
-                    .load(MovieUrlBuilder.getBackdropUrlString(movie.getBackdropPath()))
+                    .load(ImageUrlBuilder.getBackdropUrlString(movie.getBackdropPath()))
                     .into(imageView);
             CollapsingToolbarLayout appBarLayout = findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {

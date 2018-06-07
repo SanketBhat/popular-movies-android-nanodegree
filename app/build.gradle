@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
+        it.buildConfigField("String", "THE_MOVIE_DB_API_KEY", theMovieDBApiKey)
         vectorDrawables.useSupportLibrary = true
         applicationId "com.udacity.sanketbhat.popularmovies"
         minSdkVersion 17
@@ -32,6 +33,9 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.android.support:palette-v7:27.1.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 }

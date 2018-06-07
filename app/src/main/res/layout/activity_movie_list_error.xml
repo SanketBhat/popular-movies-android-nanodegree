@@ -14,37 +14,44 @@
   ~    limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/movie_list_error_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_gravity="center">
 
-    <ImageView
-        android:layout_width="@dimen/movie_list_error_layout_image_width"
-        android:layout_height="@dimen/movie_list_error_layout_image_height"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/common_content_margin"
-        android:contentDescription="@string/movie_list_error_layout_image_description"
-        app:srcCompat="@drawable/ic_movie_list_error" />
-
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/common_content_margin"
-        android:text="@string/movie_list_error_layout_error_message"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        tools:text="Oops, An error occurred!" />
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/movie_list_error_retry_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/movie_list_error_layout_retry_button_label"
-        tools:text="Retry" />
-</LinearLayout>
+        <ImageView
+            android:layout_width="@dimen/movie_list_error_layout_image_width"
+            android:layout_height="@dimen/movie_list_error_layout_image_height"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/common_content_margin"
+            android:contentDescription="@string/movie_list_error_layout_image_description"
+            app:srcCompat="@drawable/ic_movie_list_error" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/common_content_margin"
+            android:text="@string/movie_list_error_layout_error_message"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="Oops, An error occurred!" />
+
+        <Button
+            android:id="@+id/movie_list_error_retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/movie_list_error_layout_retry_button_label"
+            tools:text="Retry" />
+    </LinearLayout>
+</ScrollView>

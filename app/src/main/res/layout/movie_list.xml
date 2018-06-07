@@ -15,12 +15,11 @@
   -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.widget.RecyclerView
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/movie_list"
-    android:name="com.udacity.sanketbhat.popularmovies.MovieListFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/movie_list"
+        android:name="com.udacity.sanketbhat.popularmovies.MovieListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scrollbars="vertical"
         tools:context=".ui.MovieListActivity"
         tools:listitem="@layout/movie_grid_item" />

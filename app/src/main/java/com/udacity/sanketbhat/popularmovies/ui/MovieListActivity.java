@@ -16,15 +16,12 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.content.Context;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,9 +37,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.adapter.RecyclerViewAdapter;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.model.PageResponse;
 import com.udacity.sanketbhat.popularmovies.model.SortOrder;
-import com.udacity.sanketbhat.popularmovies.util.NetworkUtils;
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
 
 import java.util.List;
@@ -56,23 +51,20 @@ import java.util.List;
  * item details side-by-side using two vertical panes.
  */
 public class MovieListActivity extends AppCompatActivity implements
-        RecyclerViewAdapter.ItemClickListener,
-        LoaderManager.LoaderCallbacks<PageResponse> {
+        RecyclerViewAdapter.ItemClickListener {
 
-    private static final int LOADER_ID = 112233;
+    MovieListViewModel model;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
     private RecyclerViewAdapter adapter;
-    private MovieLoader movieLoader;
-    private int currentPage;
-    private int totalPage;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private int spanCount;
     private View errorLayout;
+    GridLayoutManager gridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +81,7 @@ public class MovieListActivity extends AppCompatActivity implements
             mTwoPane = true;
         }
 
+        model = ViewModelProviders.of(this).get(MovieListViewModel.class);
         spanCount = getSpanCount();
 
         progressBar = findViewById(R.id.movie_load_progress);
@@ -97,26 +90,51 @@ public class MovieListActivity extends AppCompatActivity implements
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLoading(null);
+                loadFirstPage(true);
             }
         });
 
         //Initialize the recyclerview view object
         recyclerView = findViewById(R.id.movie_list);
-        assert recyclerView != null;
         setupRecyclerView(recyclerView);
 
         //Start the loader for the fresh data.
-        startLoading(null);
+        loadFirstPage(false);
+        observeViewModel();
     }
 
-    private void startLoading(Bundle args) {
-        if (args == null) showMovieLoading();
-        if (getSupportLoaderManager().getLoader(LOADER_ID) != null) {
-            getSupportLoaderManager().restartLoader(LOADER_ID, args, this);
-        } else {
-            getSupportLoaderManager().initLoader(LOADER_ID, args, this);
-        }
+    private void observeViewModel() {
+        model.getLoadingIndicator().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loading) {
+                if (loading != null) adapter.setLoading(loading);
+            }
+        });
+
+        model.getFailureIndicator().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void aVoid) {
+                if (adapter.isLoading()) {
+                    //Error when loading nextPage
+                    //TODO: Handle this case
+                } else if (adapter.getItemCount() == 0) {
+                    showErrorLayout();
+                }
+            }
+        });
+
+        model.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                showMovieList();
+                adapter.swapMovies(movies);
+            }
+        });
+    }
+
+    private void loadFirstPage(boolean retrying) {
+        showMovieLoading();
+        model.getFirstPage(PreferenceUtils.getPreferredSortOrder(this), retrying);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -125,7 +143,8 @@ public class MovieListActivity extends AppCompatActivity implements
         recyclerView.setAdapter(adapter);
 
         //Set the gridLayoutManager with span count calculated dynamically
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,
+
+        gridLayoutManager = new GridLayoutManager(this,
                 spanCount,
                 GridLayoutManager.VERTICAL,
                 false);
@@ -214,10 +233,7 @@ public class MovieListActivity extends AppCompatActivity implements
         if (PreferenceUtils.getPreferredSortOrder(this) != sortOrder) {
             PreferenceUtils.setPreferredSortOrder(this, sortOrder);
             adapter.swapMovies(null);
-            movieLoader.moviesCache = null;
-            currentPage = 0;
-            totalPage = 0;
-            startLoading(null);
+            loadFirstPage(false);
         }
     }
 
@@ -243,123 +259,16 @@ public class MovieListActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressWarnings("StaticFieldLeak")
-    @NonNull
-    @Override
-    public Loader<PageResponse> onCreateLoader(int id, @Nullable Bundle args) {
-        if (movieLoader == null) movieLoader = new MovieLoader(this);
-
-        int pageToLoad;
-        if (args != null && ((pageToLoad = args.getInt(NetworkUtils.PAGE_TO_LOAD, 0)) != 0)) {
-            //Loader is created for loading next page.
-            //Set loader to load next page.
-            movieLoader.setLoadNext(pageToLoad);
-        }
-
-        return movieLoader;
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<PageResponse> loader, PageResponse data) {
-        if (data != null && data.getMovies() != null) {
-            //The data loaded successfully
-
-            showMovieList();
-
-            if (adapter.getMovies() == null) {
-                //Indicates the loaded data is the first page
-
-                adapter.swapMovies(data.getMovies());
-                ((MovieLoader) loader).moviesCache = data.getMovies();
-            } else {
-                adapter.addMovies(data.getMovies());
-                ((MovieLoader) loader).moviesCache = adapter.getMovies();
-            }
-            currentPage = data.getCurrentPage();
-            totalPage = data.getTotalPage();
-        } else {
-            if (adapter.isLoading()) {
-                //Error loading next page
-                adapter.setLoading(false);
-            } else {
-                //Error loading first page
-                showErrorLayout();
-            }
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<PageResponse> loader) {
-        //Not implemented.
-    }
-
     class MovieListScrollListener extends RecyclerView.OnScrollListener {
-        private final int scrollThreshold = getSpanCount() * 3;
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+            int itemCount = gridLayoutManager.getItemCount();
+            int visibleItemCount = gridLayoutManager.getChildCount();
+            int lastVisiblePosition = gridLayoutManager.findLastVisibleItemPosition();
 
-            //If already loading or showing last page, just ignore.
-            if (!adapter.isLoading() && currentPage < totalPage) {
-                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-
-                //If user reached end of the page(+ smallThreshold), start loading next page.
-                if (adapter.getItemCount() <= (scrollThreshold + layoutManager.findLastVisibleItemPosition())) {
-                    new Handler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Show loading indicator at the end of the recyclerview items
-                            adapter.setLoading(true);
-
-                            //Put the pageNumber to load and start loading
-                            int pageToLoad = currentPage + 1;
-                            Bundle arguments = new Bundle();
-                            arguments.putInt(NetworkUtils.PAGE_TO_LOAD, pageToLoad);
-                            startLoading(arguments);
-                        }
-                    });
-                }
-            }
+            model.movieListScrolled(visibleItemCount, lastVisiblePosition, itemCount);
         }
-    }
-}
-
-class MovieLoader extends AsyncTaskLoader<PageResponse> {
-    //Cache the movieList.
-    List<Movie> moviesCache;
-
-    //Flags for loading next page
-    private boolean loadNext = false;
-    private int pageToLoad = 0;
-
-    MovieLoader(@NonNull Context context) {
-        super(context);
-    }
-
-    void setLoadNext(int pageToLoad) {
-        this.loadNext = true;
-        this.pageToLoad = pageToLoad;
-    }
-
-    @Override
-    protected void onStartLoading() {
-        if (loadNext) {
-            //Load the nextPage
-            loadNext = false;
-            forceLoad();
-        } else {
-            //Load the first page
-            pageToLoad = 0;
-            if (moviesCache == null) {
-                forceLoad();
-            }
-        }
-    }
-
-    @Nullable
-    @Override
-    public PageResponse loadInBackground() {
-        return NetworkUtils.getMoviesFromServer(getContext().getApplicationContext(), pageToLoad);
     }
 }

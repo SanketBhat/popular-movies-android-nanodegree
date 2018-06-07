@@ -18,5 +18,7 @@
     <dimen name="movie_list_grid_item_text_width">150dp</dimen>
     <dimen name="movie_list_margin">2dp</dimen>
     <dimen name="movie_list_two_pane_margin">8dp</dimen>
-    <dimen name="movie_list_two_pane_recycler_view_margin">16dp</dimen>
+    <dimen name="movie_list_two_pane_recycler_view_margin">8dp</dimen>
+    <dimen name="movie_list_grid_item_card_view_margin">0dp</dimen>
+    <dimen name="movie_list_grid_item_text_padding">4dp</dimen>
 </resources>
