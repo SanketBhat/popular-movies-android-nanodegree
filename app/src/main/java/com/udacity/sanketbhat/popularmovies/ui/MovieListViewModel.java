@@ -37,14 +37,22 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieListViewModel extends ViewModel {
 
+    //Connection timeouts for network calls
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int READ_TIMEOUT = 15000;
+
+    //Scroll threshold to implement endless list
     private static final int SCROLL_THRESHOLD = 4;
+
+    //page numbers for the correct pagination
     private int currentPage = 0;
     private int totalPage = 0;
+
+    //Observable items from the activity
     private MutableLiveData<List<Movie>> movies;
     private MutableLiveData<Void> failureIndicator;
     private MutableLiveData<Boolean> loadingIndicator;
+
     private int sortOrder;
     private TheMovieDBApiService service;
 
@@ -53,15 +61,13 @@ public class MovieListViewModel extends ViewModel {
         initialize();
     }
 
+    //Initialize data/objects
     private void initialize() {
-        if (movies == null)
-            movies = new MutableLiveData<>();
+        if (movies == null) movies = new MutableLiveData<>();
 
-        if (service == null)
-            service = getTheMovieDBApiService();
+        if (service == null) service = getTheMovieDBApiService();
 
-        if (failureIndicator == null)
-            failureIndicator = new MutableLiveData<>();
+        if (failureIndicator == null) failureIndicator = new MutableLiveData<>();
 
         if (loadingIndicator == null) {
             loadingIndicator = new MutableLiveData<>();
@@ -69,11 +75,21 @@ public class MovieListViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Request for the first page of the list, called from MainListActivity
+     *
+     * @param sortOrder the sort order to list the movies, also used to distinguish between
+     *                  real calls and calls triggered by configuration changes
+     * @param retrying  this is flag determines whether it is retrying. If true it loads movie
+     *                  list even if it already exist
+     */
     public void getFirstPage(int sortOrder, boolean retrying) {
 
+        //It implies it is called by configuration changes, just return.
         if (this.sortOrder == sortOrder && !retrying) return;
-        this.sortOrder = sortOrder;
 
+        //It is intentionally called, proceed with loading first page
+        this.sortOrder = sortOrder;
         Call<PageResponse> call = service.getFirstPage(SortOrder.getSortOrderPath(sortOrder));
         call.enqueue(new Callback<PageResponse>() {
             @Override
@@ -81,17 +97,20 @@ public class MovieListViewModel extends ViewModel {
                 if (response.isSuccessful()) {
                     PageResponse pageResponse = response.body();
                     if (pageResponse != null) {
+                        //If loading successful, update data and return
                         currentPage = pageResponse.getPage();
                         totalPage = pageResponse.getTotalPages();
                         movies.setValue(pageResponse.getMovies());
+                        return;
                     }
-                } else {
-                    failureIndicator.setValue(null);
                 }
+                failureIndicator.setValue(null);
             }
 
             @Override
             public void onFailure(@NonNull Call<PageResponse> call, @NonNull Throwable t) {
+                //If call failed trigger failureIndicator so that observing activity shows
+                //Error layout
                 failureIndicator.setValue(null);
             }
         });
@@ -108,15 +127,16 @@ public class MovieListViewModel extends ViewModel {
                 loadingIndicator.setValue(false);
                 if (response.isSuccessful()) {
                     PageResponse pageResponse = response.body();
-                    if (pageResponse != null) {
+                    if (pageResponse != null && movies.getValue() != null) {
+
+                        //Next page loaded, append it to existing list
                         currentPage = pageResponse.getPage();
                         totalPage = pageResponse.getTotalPages();
-                        if (movies.getValue() != null)
-                            movies.getValue().addAll(pageResponse.getMovies());
+                        movies.getValue().addAll(pageResponse.getMovies());
+                        return;
                     }
-                } else {
-                    failureIndicator.setValue(null);
                 }
+                failureIndicator.setValue(null);
             }
 
             @Override
@@ -140,6 +160,7 @@ public class MovieListViewModel extends ViewModel {
         return loadingIndicator;
     }
 
+    //Build retrofit library components and obtain service object
     private TheMovieDBApiService getTheMovieDBApiService() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
@@ -158,6 +179,7 @@ public class MovieListViewModel extends ViewModel {
         return currentPage >= totalPage;
     }
 
+    //Trigger getNextPage() call if user is reaching end of the list
     public void movieListScrolled(int visibleItemCount, int lastVisiblePosition, int totalCount) {
         if ((visibleItemCount + lastVisiblePosition + SCROLL_THRESHOLD) >= totalCount && !isLastPage()) {
             getNextPage();

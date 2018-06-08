@@ -39,14 +39,26 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
-            <ImageView
-                android:id="@+id/image_backdrop"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/movie_detail_backdrop_image_description"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher"
-                app:layout_collapseMode="parallax" />
+                android:layout_gravity="bottom">
+
+                <ImageView
+                    android:id="@+id/image_backdrop"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/movie_detail_backdrop_image_description"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/ic_launcher"
+                    app:layout_collapseMode="parallax" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/movie_detail_backdrop_scrim_height"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/backdrop_image_scrim" />
+            </FrameLayout>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/detail_toolbar"

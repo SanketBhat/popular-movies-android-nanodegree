@@ -16,7 +16,7 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -45,6 +45,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
+        //Postpone transition until fragment inflated.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            postponeEnterTransition();
+        }
+
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -55,10 +60,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         Movie movie = getIntent().getParcelableExtra(MovieDetailFragment.ARG_ITEM);
         if (movie != null) {
             ImageView imageView = findViewById(R.id.image_backdrop);
+
+            //Load backdrop image.
             Picasso.with(this)
                     .load(ImageUrlBuilder.getBackdropUrlString(movie.getBackdropPath()))
                     .into(imageView);
             CollapsingToolbarLayout appBarLayout = findViewById(R.id.toolbar_layout);
+
             if (appBarLayout != null) {
                 appBarLayout.setTitle(movie.getTitle());
             }
@@ -91,7 +99,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            navigateUpTo(new Intent(this, MovieListActivity.class));
+            supportFinishAfterTransition();
             return true;
         }
         return super.onOptionsItemSelected(item);

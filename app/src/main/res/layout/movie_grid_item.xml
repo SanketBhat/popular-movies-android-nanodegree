@@ -37,7 +37,9 @@
             android:layout_height="@dimen/movie_list_grid_item_poster_height"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/list_item_image_desc"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:transitionName="@string/shared_element_transition_name"
+            tools:ignore="UnusedAttribute" />
 
         <TextView
             android:id="@+id/movie_grid_item_title"

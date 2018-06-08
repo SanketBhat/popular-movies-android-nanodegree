@@ -17,12 +17,14 @@
 package com.udacity.sanketbhat.popularmovies.ui;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,10 +45,7 @@ import java.util.Locale;
  * on handsets.
  */
 public class MovieDetailFragment extends Fragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
+
     public static final String ARG_ITEM = "movieItem";
     private Movie movie;
 
@@ -70,15 +69,31 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_movie_detail_content, container, false);
 
-        ImageView posterImage = rootView.findViewById(R.id.movieDetailPoster);
-        TextView title = rootView.findViewById(R.id.movieDetailName);
-        TextView genre = rootView.findViewById(R.id.movieDetailGenre);
-        TextView plot = rootView.findViewById(R.id.movieDetailPlotSynopsis);
-        TextView releaseDate = rootView.findViewById(R.id.movieDetailReleaseDate);
-        TextView ratingText = rootView.findViewById(R.id.movieDetailRatingText);
+        View rootView = inflater.inflate(R.layout.activity_movie_detail_content, container, false);
+        rootView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+                        getActivity() != null &&
+                        getActivity().getClass() == MovieDetailActivity.class) {
+                    //Start shared transition on Lollipop and higher devices.
+                    getActivity().startPostponedEnterTransition();
+                }
+                return true;
+            }
+        });
+
         if (movie != null) {
+            //Getting view instances
+            ImageView posterImage = rootView.findViewById(R.id.movieDetailPoster);
+            TextView title = rootView.findViewById(R.id.movieDetailName);
+            TextView genre = rootView.findViewById(R.id.movieDetailGenre);
+            TextView plot = rootView.findViewById(R.id.movieDetailPlotSynopsis);
+            TextView releaseDate = rootView.findViewById(R.id.movieDetailReleaseDate);
+            TextView ratingText = rootView.findViewById(R.id.movieDetailRatingText);
+
+            //Loading views with data
             Picasso.with(getContext())
                     .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
                     .into(posterImage);
@@ -97,7 +112,7 @@ public class MovieDetailFragment extends Fragment {
             }
 
             float rating = (float) (movie.getVoteAverage() / 2.0f);
-            String ratingString = "(" + String.format(Locale.getDefault(), "%.1f", rating) + "/5)";
+            String ratingString = String.format(Locale.getDefault(), getString(R.string.movie_detail_average_rating_string), rating);
             ratingText.setText(ratingString);
         }
 

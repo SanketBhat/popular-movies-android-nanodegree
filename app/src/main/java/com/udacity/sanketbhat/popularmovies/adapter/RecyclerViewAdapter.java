@@ -76,6 +76,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         switch (getItemViewType(position)) {
             case VIEW_TYPE_MOVIE:
                 if (holder instanceof ViewHolder) {
+                    //Bind view with data
                     final ViewHolder viewHolder = (ViewHolder) holder;
                     viewHolder.movieGenre.setText(movies.get(position).getGenres());
                     viewHolder.movieName.setText(movies.get(position).getTitle());
@@ -99,12 +100,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof ViewHolder)
-            ((ViewHolder) holder).cleanUp();
+        //Cleanup resources after viewHolder recycled
+        if (holder instanceof ViewHolder) ((ViewHolder) holder).cleanUp();
     }
 
     @Override
     public int getItemCount() {
+        //If movies = null return 0, or if next page is loading return size of movies + 1
+        //Else its normal to return movies.size()
         if (movies == null) return 0;
         else if (loading) return movies.size() + 1;
         else return movies.size();
@@ -113,10 +116,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         //If loading new page, return last element type as loading indicator
-        if ((position == movies.size()) && isLoading())
-            return VIEW_TYPE_PROGRESS;
-        else
-            return VIEW_TYPE_MOVIE;
+        if ((position == movies.size()) && isLoading()) return VIEW_TYPE_PROGRESS;
+        else return VIEW_TYPE_MOVIE;
     }
 
     public boolean isLoading() {
@@ -136,7 +137,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public interface ItemClickListener {
-        void onClickItem(Movie movie);
+        void onClickItem(View v, Movie movie);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -155,11 +156,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View v) {
             if (clickListener != null) {
-                clickListener.onClickItem(movies.get(getAdapterPosition()));
+                clickListener.onClickItem(v, movies.get(getAdapterPosition()));
             }
         }
 
         private void cleanUp() {
+            //Cancel request once viewHolder recycled.
             Picasso.with(moviePoster.getContext())
                     .cancelRequest(moviePoster);
             moviePoster.setImageDrawable(null);

@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="app_bar_height">200dp</dimen>
-    <dimen name="movie_list_two_pane_list_width">320dp</dimen>
+    <!--50% of app_bar_height"-->
+    <dimen name="movie_detail_backdrop_scrim_height">100dp</dimen>
     <dimen name="common_content_margin">8dp</dimen>
     <dimen name="common_label_margin_top">16dp</dimen>
     <dimen name="common_card_view_padding">4dp</dimen>
-    <dimen name="movie_detail_card_view_margin">4dp</dimen>
-    <dimen name="movie_detail_movie_poster_width">150dp</dimen>
-    <dimen name="movie_detail_movie_poster_height">225dp</dimen>
-    <dimen name="movie_list_error_layout_image_width">200dp</dimen>
-    <dimen name="movie_list_error_layout_image_height">200dp</dimen>
     <dimen name="common_card_view_elevation">4dp</dimen>
+
+    <!--movie list grid item-->
     <dimen name="movie_list_grid_item_card_view_elevation">2dp</dimen>
     <dimen name="movie_list_grid_item_layout_margin">2dp</dimen>
     <dimen name="movie_list_grid_item_poster_width">150dp</dimen>
     <dimen name="movie_list_grid_item_poster_height">200dp</dimen>
     <dimen name="movie_list_grid_item_text_width">150dp</dimen>
-    <dimen name="movie_list_margin">2dp</dimen>
-    <dimen name="movie_list_two_pane_margin">8dp</dimen>
-    <dimen name="movie_list_two_pane_recycler_view_margin">8dp</dimen>
     <dimen name="movie_list_grid_item_card_view_margin">0dp</dimen>
     <dimen name="movie_list_grid_item_text_padding">4dp</dimen>
+
+    <!--movie list-->
+    <dimen name="movie_list_two_pane_list_width">320dp</dimen>
+    <dimen name="movie_list_error_layout_image_width">200dp</dimen>
+    <dimen name="movie_list_error_layout_image_height">200dp</dimen>
+    <dimen name="movie_list_two_pane_margin">8dp</dimen>
+    <dimen name="movie_list_two_pane_recycler_view_margin">8dp</dimen>
+
+    <!--movie detail-->
+    <dimen name="movie_detail_card_view_margin">4dp</dimen>
+    <dimen name="movie_detail_movie_poster_width">150dp</dimen>
+    <dimen name="movie_detail_movie_poster_height">225dp</dimen>
+
 </resources>

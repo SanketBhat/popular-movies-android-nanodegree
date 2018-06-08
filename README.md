@@ -10,6 +10,7 @@ This is second project in the Android Developer Nanodegree, Udacity. I created i
 ## Libraries and APIs used
 - [Picasso](http://square.github.io/picasso/)
 - [The Movie DB API](https://www.themoviedb.org/documentation/api)
+- [Retrofit](http://square.github.io/retrofit/)
 
 ## Before you build
   This project uses `TheMovieDB API` to fetch the movie name and details. Before you build the project add your `API KEY` to the `gradle.properties` file
