@@ -18,11 +18,13 @@ package com.udacity.sanketbhat.popularmovies.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -260,6 +262,18 @@ public class MovieListActivity extends AppCompatActivity implements
             case R.id.menu_sort_rating:
                 changeSortOrderTo(SortOrder.SORT_ORDER_TOP_RATED);
                 return true;
+
+            case R.id.menu_main_credits:
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setTitle(R.string.menu_main_credits)
+                        .setMessage(R.string.credits_string)
+                        .setPositiveButton(R.string.credit_dialog_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create();
+                dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }
