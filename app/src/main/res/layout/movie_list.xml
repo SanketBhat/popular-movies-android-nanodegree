@@ -13,27 +13,8 @@
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
   -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/movie_list"
-        android:name="com.udacity.sanketbhat.popularmovies.MovieListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        tools:context=".ui.MovieListActivity"
-        tools:listitem="@layout/movie_grid_item" />
-
-    <ProgressBar
-        android:id="@+id/movie_load_progress"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <include
-        layout="@layout/activity_movie_list_error"
-        android:visibility="gone" />
-</merge>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/movie_list_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

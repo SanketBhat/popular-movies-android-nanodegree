@@ -16,17 +16,16 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
+import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
+import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
@@ -38,12 +37,14 @@ import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
  */
 public class MovieDetailActivity extends AppCompatActivity {
 
+    ActivityMovieDetailBinding mBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-        Toolbar toolbar = findViewById(R.id.detail_toolbar);
-        setSupportActionBar(toolbar);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+        setSupportActionBar(mBinding.detailToolbar);
 
         //Postpone transition until fragment inflated.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -59,16 +60,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         //Set name and image for collapsing toolbar layout
         Movie movie = getIntent().getParcelableExtra(MovieDetailFragment.ARG_ITEM);
         if (movie != null) {
-            ImageView imageView = findViewById(R.id.image_backdrop);
-
             //Load backdrop image.
             Picasso.with(this)
                     .load(ImageUrlBuilder.getBackdropUrlString(movie.getBackdropPath()))
-                    .into(imageView);
-            CollapsingToolbarLayout appBarLayout = findViewById(R.id.toolbar_layout);
+                    .into(mBinding.imageBackdrop);
 
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(movie.getTitle());
+            if (mBinding.toolbarLayout != null) {
+                mBinding.toolbarLayout.setTitle(movie.getTitle());
             }
         }
 
@@ -90,7 +88,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             MovieDetailFragment fragment = new MovieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.movie_detail_container, fragment)
+                    .add(R.id.movieDetailContainer, fragment)
                     .commit();
         }
     }

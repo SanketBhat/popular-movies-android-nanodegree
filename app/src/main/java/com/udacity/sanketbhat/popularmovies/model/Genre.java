@@ -16,7 +16,16 @@
 
 package com.udacity.sanketbhat.popularmovies.model;
 
+import com.google.gson.annotations.SerializedName;
+
 class Genre {
+
+    @SerializedName("id")
+    private int id;
+    @SerializedName("name")
+    private String genreName;
+
+    //Static data for genre
     public static String getGenreString(int genreId) {
         switch (genreId) {
             case 12:
@@ -60,5 +69,21 @@ class Genre {
             default:
                 return "Unknown";
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getGenreName() {
+        return genreName;
+    }
+
+    public void setGenreName(String genreName) {
+        this.genreName = genreName;
     }
 }

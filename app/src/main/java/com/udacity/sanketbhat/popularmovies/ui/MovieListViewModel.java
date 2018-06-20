@@ -16,33 +16,27 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.udacity.sanketbhat.popularmovies.Dependencies;
 import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
+import com.udacity.sanketbhat.popularmovies.database.MovieDao;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.PageResponse;
 import com.udacity.sanketbhat.popularmovies.model.SortOrder;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MovieListViewModel extends ViewModel {
-
-    //Connection timeouts for network calls
-    private static final int CONNECTION_TIMEOUT = 10000;
-    private static final int READ_TIMEOUT = 15000;
-
-    //Scroll threshold to implement endless list
-    private static final int SCROLL_THRESHOLD = 4;
+public class MovieListViewModel extends AndroidViewModel {
 
     //page numbers for the correct pagination
     private int currentPage = 0;
@@ -55,9 +49,11 @@ public class MovieListViewModel extends ViewModel {
 
     private int sortOrder;
     private TheMovieDBApiService service;
+    private MovieDao movieDao;
 
 
-    public MovieListViewModel() {
+    public MovieListViewModel(Application application) {
+        super(application);
         initialize();
     }
 
@@ -65,7 +61,7 @@ public class MovieListViewModel extends ViewModel {
     private void initialize() {
         if (movies == null) movies = new MutableLiveData<>();
 
-        if (service == null) service = getTheMovieDBApiService();
+        if (service == null) service = Dependencies.getTheMovieDBApiService();
 
         if (failureIndicator == null) failureIndicator = new MutableLiveData<>();
 
@@ -73,6 +69,8 @@ public class MovieListViewModel extends ViewModel {
             loadingIndicator = new MutableLiveData<>();
             loadingIndicator.setValue(false);
         }
+
+        movieDao = Dependencies.getMovieDao(getApplication().getApplicationContext());
     }
 
     /**
@@ -84,6 +82,8 @@ public class MovieListViewModel extends ViewModel {
      *                  list even if it already exist
      */
     public void getFirstPage(int sortOrder, boolean retrying) {
+
+        test();
 
         //It implies it is called by configuration changes, just return.
         if (this.sortOrder == sortOrder && !retrying) return;
@@ -116,8 +116,22 @@ public class MovieListViewModel extends ViewModel {
         });
     }
 
+    private void test() {
+        service.getMovie(24428).enqueue(new Callback<Movie>() {
+            @Override
+            public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
+                Movie movie = response.body();
+                Log.e("Loaded", "onResponse: Loaded");
+            }
 
-    private void getNextPage() {
+            @Override
+            public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
+                Log.e("Loaded", "onResponse: Loaded");
+            }
+        });
+    }
+
+    public void getNextPage() {
         if (loadingIndicator.getValue() != null && loadingIndicator.getValue()) return;
 
         loadingIndicator.setValue(true);
@@ -160,29 +174,11 @@ public class MovieListViewModel extends ViewModel {
         return loadingIndicator;
     }
 
-    //Build retrofit library components and obtain service object
-    private TheMovieDBApiService getTheMovieDBApiService() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS)
-                .retryOnConnectionFailure(true)
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("http://api.themoviedb.org/3/movie/")
-                .client(okHttpClient)
-                .build();
-        return retrofit.create(TheMovieDBApiService.class);
+    public LiveData<List<Movie>> getFavorites() {
+        return movieDao.getAllMovies();
     }
 
-    private boolean isLastPage() {
+    public boolean isLastPage() {
         return currentPage >= totalPage;
-    }
-
-    //Trigger getNextPage() call if user is reaching end of the list
-    public void movieListScrolled(int visibleItemCount, int lastVisiblePosition, int totalCount) {
-        if ((visibleItemCount + lastVisiblePosition + SCROLL_THRESHOLD) >= totalCount && !isLastPage()) {
-            getNextPage();
-        }
     }
 }

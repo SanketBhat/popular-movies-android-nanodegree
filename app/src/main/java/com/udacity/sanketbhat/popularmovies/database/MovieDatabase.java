@@ -14,20 +14,16 @@
  *    limitations under the License.
  */
 
-package com.udacity.sanketbhat.popularmovies;
+package com.udacity.sanketbhat.popularmovies.database;
 
-import org.junit.Test;
+import android.arch.persistence.room.Database;
+import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 
-import static org.junit.Assert.assertEquals;
+import com.udacity.sanketbhat.popularmovies.model.Movie;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
-    }
+@Database(entities = {Movie.class}, version = 1, exportSchema = false)
+@TypeConverters({MovieTypeConverter.class})
+public abstract class MovieDatabase extends RoomDatabase {
+    public abstract MovieDao getMovieDao();
 }

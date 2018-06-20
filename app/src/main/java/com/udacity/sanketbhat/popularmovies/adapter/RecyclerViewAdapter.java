@@ -78,11 +78,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                 if (holder instanceof ViewHolder) {
                     //Bind view with data
                     final ViewHolder viewHolder = (ViewHolder) holder;
-                    viewHolder.movieGenre.setText(movies.get(position).getGenres());
+                    viewHolder.movieGenre.setText(movies.get(position).getGenresString());
                     viewHolder.movieName.setText(movies.get(position).getTitle());
                     Picasso.with(mContext)
                             .load(ImageUrlBuilder.getPosterUrlString(movies.get(position).getPosterPath()))
-                            .tag(MovieListActivity.class)
+                            .tag(MovieListActivity.class.getSimpleName())
                             .error(R.drawable.ic_movie_grid_item_image_error)
                             .placeholder(R.drawable.ic_loading_indicator)
                             .into(viewHolder.moviePoster);
@@ -134,10 +134,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     public void swapMovies(List<Movie> movies) {
         this.movies = movies;
         notifyDataSetChanged();
-    }
-
-    public interface ItemClickListener {
-        void onClickItem(View v, Movie movie);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

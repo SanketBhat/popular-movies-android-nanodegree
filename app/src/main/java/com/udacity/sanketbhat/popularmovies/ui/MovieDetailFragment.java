@@ -16,27 +16,25 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
+import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieDetailContentBinding;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -48,6 +46,7 @@ public class MovieDetailFragment extends Fragment {
 
     public static final String ARG_ITEM = "movieItem";
     private Movie movie;
+    private MovieDetailViewModel viewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,6 +62,9 @@ public class MovieDetailFragment extends Fragment {
         if (getArguments() != null && getArguments().containsKey(ARG_ITEM)) {
             movie = getArguments().getParcelable(ARG_ITEM);
         }
+
+        if (getContext() != null)
+            viewModel = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
     }
 
 
@@ -71,6 +73,7 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.activity_movie_detail_content, container, false);
+        ActivityMovieDetailContentBinding mBinding = DataBindingUtil.bind(rootView);
         rootView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -84,36 +87,21 @@ public class MovieDetailFragment extends Fragment {
             }
         });
 
-        if (movie != null) {
-            //Getting view instances
-            ImageView posterImage = rootView.findViewById(R.id.movieDetailPoster);
-            TextView title = rootView.findViewById(R.id.movieDetailName);
-            TextView genre = rootView.findViewById(R.id.movieDetailGenre);
-            TextView plot = rootView.findViewById(R.id.movieDetailPlotSynopsis);
-            TextView releaseDate = rootView.findViewById(R.id.movieDetailReleaseDate);
-            TextView ratingText = rootView.findViewById(R.id.movieDetailRatingText);
-
+        if (movie != null && mBinding != null) {
             //Loading views with data
             Picasso.with(getContext())
                     .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
-                    .into(posterImage);
-            title.setText(movie.getTitle());
-            genre.setText(movie.getGenres());
-            plot.setText(movie.getOverview());
+                    .into(mBinding.movieDetailPoster);
+            mBinding.setMovie(movie);
 
-            try {
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = simpleDateFormat.parse(movie.getReleaseDate());
-                String dateText = SimpleDateFormat.getDateInstance().format(date);
-                releaseDate.setText(dateText);
-            } catch (ParseException e) {
-                releaseDate.setText(R.string.movie_detail_date_error);
-                e.printStackTrace();
+            if (movie.getVideos() == null || movie.getReviews() == null) {
+                viewModel.getMovie(movie.getId()).observe(this, new Observer<Movie>() {
+                    @Override
+                    public void onChanged(@Nullable Movie movie) {
+                        Log.e("loaded", "do some stuff");
+                    }
+                });
             }
-
-            float rating = (float) (movie.getVoteAverage() / 2.0f);
-            String ratingString = String.format(Locale.getDefault(), getString(R.string.movie_detail_average_rating_string), rating);
-            ratingText.setText(ratingString);
         }
 
         return rootView;

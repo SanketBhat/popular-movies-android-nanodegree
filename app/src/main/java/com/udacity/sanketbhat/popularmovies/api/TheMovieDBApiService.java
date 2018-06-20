@@ -17,6 +17,7 @@
 package com.udacity.sanketbhat.popularmovies.api;
 
 import com.udacity.sanketbhat.popularmovies.BuildConfig;
+import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.PageResponse;
 
 import retrofit2.Call;
@@ -25,7 +26,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface TheMovieDBApiService {
-
     String API_KEY = BuildConfig.THE_MOVIE_DB_API_KEY;
 
     @GET("{type}?api_key=" + API_KEY)
@@ -33,4 +33,7 @@ public interface TheMovieDBApiService {
 
     @GET("{type}?api_key=" + API_KEY)
     Call<PageResponse> getPage(@Path("type") String sortOrderPath, @Query("page") int pageNumber);
+
+    @GET("{id}?api_key=" + API_KEY + "&append_to_response=videos,reviews")
+    Call<Movie> getMovie(@Path("id") int id);
 }

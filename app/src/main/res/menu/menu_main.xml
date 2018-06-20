@@ -18,25 +18,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_action_favorites"
+        android:icon="@drawable/ic_favorite_white"
+        android:orderInCategory="1"
+        android:title="@string/menu_main_action_favorites"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/menu_action_sort"
         android:icon="@drawable/ic_menu_sort"
+        android:orderInCategory="2"
         android:title="@string/menu_main_action_sort"
         app:showAsAction="ifRoom">
         <menu
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <item
-                android:id="@+id/menu_sort_popularity"
-                android:title="@string/menu_main_option_popular_movies"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/menu_sort_rating"
-                android:title="@string/menu_main_option_top_rated"
-                app:showAsAction="never" />
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_sort_popularity"
+                    android:title="@string/menu_main_option_popular_movies"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/menu_sort_rating"
+                    android:title="@string/menu_main_option_top_rated"
+                    app:showAsAction="never" />
+            </group>
         </menu>
     </item>
     <item
         android:id="@+id/menu_main_credits"
         android:title="@string/menu_main_credits"
+        android:orderInCategory="3"
         app:showAsAction="never" />
 </menu>
