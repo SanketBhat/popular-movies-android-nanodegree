@@ -24,6 +24,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.udacity.sanketbhat.popularmovies.model.Movie;
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
 
 import java.util.List;
 
@@ -38,6 +40,15 @@ public interface MovieDao {
     @Query("SELECT * FROM favorites WHERE id = :id")
     LiveData<Movie> isFavorite(int id);
 
+    @Query("SELECT * FROM favorites WHERE id = :id")
+    Movie getMovie(int id);
+
     @Query("SELECT * FROM favorites ORDER BY title ASC")
     LiveData<List<Movie>> getAllMovies();
+
+    @Query("UPDATE favorites SET videoResponse = :videoResponse WHERE id = :id")
+    void updateVideos(int id, VideoResponse videoResponse);
+
+    @Query("UPDATE favorites SET reviewResponse = :reviewResponse WHERE id = :id")
+    void updateReviews(int id, ReviewResponse reviewResponse);
 }

@@ -20,11 +20,18 @@ import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.util.DisplayMetrics;
 
+/**
+ * The grid layout manager that dynamically set the span size of the items
+ * In the two pane layout, the items per a row is limit to 2. and in single
+ * pane layout it is dynamically calculated using the screen width and item width
+ */
 public class MovieGridLayoutManager extends GridLayoutManager {
     private static final int SINGLE_GRID_ITEM_WIDTH = 160;
     private int movieItemSpanCount;
+    private static final int TWO_PANE_SPAN_SIZE = 2;
+    private static final int TWO_PANE_MINIMUM_SIZE = 720;
 
-    public MovieGridLayoutManager(Context context, RecyclerViewAdapter adapter) {
+    public MovieGridLayoutManager(Context context, MovieListAdapter adapter) {
         super(context, 1, GridLayoutManager.VERTICAL, false);
         movieItemSpanCount = getCustomSpanCount(context);
         setSpanCount(movieItemSpanCount);
@@ -38,28 +45,29 @@ public class MovieGridLayoutManager extends GridLayoutManager {
 
         //If width is more than 720dp, its twoPane layout
         //And it can have at most 2 item per row
-        if (width >= 720) return 2;
+        if (width >= TWO_PANE_MINIMUM_SIZE) return TWO_PANE_SPAN_SIZE;
 
-        //If not twoPane layout calculate
+        //If not twoPane layout, calculate calculate span size
         //160 is the fixed width for a single movie item.
         return (int) width / SINGLE_GRID_ITEM_WIDTH;
     }
 
     class MovieSpanSizeLookup extends GridLayoutManager.SpanSizeLookup {
 
-        private RecyclerViewAdapter mAdapter;
+        private MovieListAdapter mAdapter;
 
-        MovieSpanSizeLookup(RecyclerViewAdapter adapter) {
+        MovieSpanSizeLookup(MovieListAdapter adapter) {
             this.mAdapter = adapter;
         }
 
         @Override
         public int getSpanSize(int position) {
             switch (mAdapter.getItemViewType(position)) {
-                case RecyclerViewAdapter.VIEW_TYPE_PROGRESS:
+                //If list is showing the progress, then it should occupy the complete device width
+                case MovieListAdapter.VIEW_TYPE_PROGRESS:
                     return movieItemSpanCount;
 
-                case RecyclerViewAdapter.VIEW_TYPE_MOVIE:
+                case MovieListAdapter.VIEW_TYPE_MOVIE:
                     return 1;
 
                 default:

@@ -16,7 +16,6 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -32,9 +31,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.sanketbhat.popularmovies.Dependencies;
 import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.adapter.ItemClickListener;
+import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.SortOrder;
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
@@ -47,7 +45,7 @@ import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class MovieListActivity extends AppCompatActivity implements ItemClickListener, FragmentManager.OnBackStackChangedListener {
+public class MovieListActivity extends AppCompatActivity implements MovieClickListener, FragmentManager.OnBackStackChangedListener {
 
     public boolean mTwoPane;
     private Menu mOptionMenu;
@@ -72,7 +70,7 @@ public class MovieListActivity extends AppCompatActivity implements ItemClickLis
         if (savedInstanceState == null) {
             MovieListFragment fragment = new MovieListFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_list_container, fragment, "movie_list_fragment_tag")
+                    .replace(R.id.movie_list_container, fragment)
                     .commit();
         }
 
@@ -113,13 +111,11 @@ public class MovieListActivity extends AppCompatActivity implements ItemClickLis
         switch (item.getItemId()) {
             case R.id.menu_sort_popularity:
                 item.setChecked(true);
-                changeSortOrderTo(SortOrder.SORT_ORDER_POPULAR);
-                return false;
+                return changeSortOrderTo(SortOrder.SORT_ORDER_POPULAR);
 
             case R.id.menu_sort_rating:
                 item.setChecked(true);
-                changeSortOrderTo(SortOrder.SORT_ORDER_TOP_RATED);
-                return false;
+                return changeSortOrderTo(SortOrder.SORT_ORDER_TOP_RATED);
 
             case R.id.menu_action_favorites:
                 MovieListFavoritesFragment movieListFavoritesFragment = new MovieListFavoritesFragment();
@@ -134,12 +130,7 @@ public class MovieListActivity extends AppCompatActivity implements ItemClickLis
                 AlertDialog dialog = new AlertDialog.Builder(this)
                         .setTitle(R.string.menu_main_credits)
                         .setMessage(R.string.credits_string)
-                        .setPositiveButton(R.string.credit_dialog_button, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create();
+                        .setPositiveButton(R.string.credit_dialog_button, (dialog1, which) -> dialog1.dismiss()).create();
                 dialog.show();
                 break;
 
@@ -150,18 +141,18 @@ public class MovieListActivity extends AppCompatActivity implements ItemClickLis
         return super.onOptionsItemSelected(item);
     }
 
-    private void changeSortOrderTo(int sortOrder) {
+    private boolean changeSortOrderTo(int sortOrder) {
         if (PreferenceUtils.getPreferredSortOrder(this) != sortOrder) {
             PreferenceUtils.setPreferredSortOrder(this, sortOrder);
+            return false;
+        } else {
+            return true;
         }
     }
 
 
     @Override
     public void onClickItem(View v, Movie movie) {
-
-        //TODO: Temporary, saving all clicked movies as favorites for testing.
-        Dependencies.getMovieDao(this).insert(movie);
         //Pass the clicked movie item.
         //It will be removed in stage 2.
         Bundle arguments = new Bundle();

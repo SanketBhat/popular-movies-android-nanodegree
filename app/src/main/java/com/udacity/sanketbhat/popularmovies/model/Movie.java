@@ -19,7 +19,6 @@ package com.udacity.sanketbhat.popularmovies.model;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -33,7 +32,6 @@ import java.util.List;
 
 @Entity(tableName = "favorites")
 public class Movie implements Parcelable {
-
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
@@ -56,7 +54,6 @@ public class Movie implements Parcelable {
     @SerializedName("release_date")
     private String releaseDate;
     @SerializedName("genre_ids")
-    @Ignore
     private int[] genreIds = null;
     @SerializedName("backdrop_path")
     private String backdropPath;
@@ -67,16 +64,11 @@ public class Movie implements Parcelable {
     @SerializedName("adult")
     private boolean adult;
     @SerializedName("videos")
-    @Ignore
-    private Videos videoResponse;
+    private VideoResponse videoResponse;
     @SerializedName("genres")
-    @Ignore
     private List<Genre> genres;
     @SerializedName("reviews")
-    @Ignore
-    private Reviews reviewResponse;
-
-
+    private ReviewResponse reviewResponse;
     public Movie() {
 
     }
@@ -93,24 +85,21 @@ public class Movie implements Parcelable {
         adult = in.readByte() != 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeDouble(voteAverage);
-        dest.writeString(releaseDate);
-        dest.writeIntArray(genreIds);
-        dest.writeString(backdropPath);
-        dest.writeString(overview);
-        dest.writeString(posterPath);
-        dest.writeByte((byte) (adult ? 1 : 0));
+    public VideoResponse getVideoResponse() {
+        return videoResponse;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void setVideoResponse(VideoResponse videoResponse) {
+        this.videoResponse = videoResponse;
     }
 
+    public ReviewResponse getReviewResponse() {
+        return reviewResponse;
+    }
+
+    public void setReviewResponse(ReviewResponse reviewResponse) {
+        this.reviewResponse = reviewResponse;
+    }
 
     public Integer getId() {
         return id;
@@ -119,7 +108,6 @@ public class Movie implements Parcelable {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public Double getVoteAverage() {
         return voteAverage;
@@ -136,7 +124,6 @@ public class Movie implements Parcelable {
     public void setTitle(String title) {
         this.title = title;
     }
-
 
     public String getPosterPath() {
         return posterPath;
@@ -155,6 +142,14 @@ public class Movie implements Parcelable {
     }
 
     public String getGenresString() {
+        //If Genre list is not null, return its names
+        if (genres != null && genres.size() > 0) {
+            String strings[] = new String[genres.size()];
+            for (int i = 0; i < genres.size(); i++) {
+                strings[i] = genres.get(i).getGenreName();
+            }
+            return TextUtils.join(", ", strings);
+        }
         if (genreIds == null) return "";
         String[] strings = new String[genreIds.length];
         for (int i = 0; i < genreIds.length; i++) {
@@ -206,17 +201,39 @@ public class Movie implements Parcelable {
         return getReleaseDate();
     }
 
-    public List<Videos.Video> getVideos() {
+    public List<Video> getVideos() {
         if (videoResponse == null) return null;
         return videoResponse.getVideos();
     }
 
-    public List<Reviews.Review> getReviews() {
+    public List<Review> getReviews() {
         if (reviewResponse == null) return null;
         return reviewResponse.getReviews();
     }
 
     public List<Genre> getGenres() {
         return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeDouble(voteAverage);
+        dest.writeString(releaseDate);
+        dest.writeIntArray(genreIds);
+        dest.writeString(backdropPath);
+        dest.writeString(overview);
+        dest.writeString(posterPath);
+        dest.writeByte((byte) (adult ? 1 : 0));
     }
 }

@@ -20,50 +20,38 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.udacity.sanketbhat.popularmovies.Dependencies;
-import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
-import com.udacity.sanketbhat.popularmovies.database.MovieDao;
+import com.udacity.sanketbhat.popularmovies.MovieRepository;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MovieDetailViewModel extends AndroidViewModel {
-    private TheMovieDBApiService theMovieDBApiService;
-    private MovieDao movieDao;
     private MutableLiveData<Movie> movie;
+    private MovieRepository repo;
 
     public MovieDetailViewModel(Application application) {
         super(application);
-        theMovieDBApiService = Dependencies.getTheMovieDBApiService();
-        movieDao = Dependencies.getMovieDao(getApplication().getApplicationContext());
         movie = new MutableLiveData<>();
+        repo = MovieRepository.getInstance(application.getApplicationContext());
     }
 
     public LiveData<Movie> isFavorite(int id) {
-        return movieDao.isFavorite(id);
+        return repo.isFavorite(id);
     }
 
     public MutableLiveData<Movie> getMovie(int id) {
-        theMovieDBApiService.getMovie(id).enqueue(new Callback<Movie>() {
-            @Override
-            public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Movie movieResult = response.body();
-                    movie.setValue(movieResult);
-                    Log.e("Data loaded", "Data Loaded");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
-
-            }
-        });
+        if (movie.getValue() != null
+                && movie.getValue().getId() == id
+                && movie.getValue().getVideoResponse() != null
+                && movie.getValue().getReviewResponse() != null) return movie;
+        repo.getMovie(id, responseMovie -> movie.postValue(responseMovie));
         return movie;
+    }
+
+    public void insertIntoFavorites(Movie movie) {
+        repo.insertMovie(movie);
+    }
+
+    public void removeFromFavorites(Movie movie) {
+        repo.deleteMovie(movie);
     }
 }

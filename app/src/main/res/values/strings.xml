@@ -24,18 +24,28 @@
 
     <!--Movie detail-->
     <string name="title_movie_detail">Movie Detail</string>
-    <string name="movie_detail_date_error">Not available</string>
     <string name="movie_detail_backdrop_image_description">Backdrop image</string>
     <string name="movie_detail_release_date_label">Release Date</string>
     <string name="movie_detail_average_rating_label">Average rating</string>
     <string name="movie_detail_plot_label">Synopsis</string>
     <string name="movie_detail_average_rating_string">(%.1f/5.0)</string>
+    <string name="movie_detail_trailers_label">Trailers</string>
+    <string name="movie_detail_review_label">Reviews</string>
+    <string name="movie_details_video_description">Movie Video/Trailer</string>
+    <string name="movie_details_video_play_button">Play Button</string>
+    <string name="empty_list_message">No reviews!</string>
+    <string name="video_list_empty_message">No videos!</string>
+
 
     <!--Movie List-->
     <string name="movie_list_error_layout_error_message">Oops, An error occurred!</string>
     <string name="movie_list_error_layout_retry_button_label">Retry</string>
     <string name="movie_grid_item_loading_indicator_text">Loading more movies…</string>
     <string name="shared_element_transition_name">poster_image</string>
+    <string name="video_clicked_no_app_error">No application installed to open the video</string>
+    <string name="title_popular_movie">Popular Movies</string>
+    <string name="title_top_rated_movie">Top Rated Movies</string>
+    <string name="menu_main_action_favorites">Favorites</string>
 
     <!--Menu-->
     <string name="menu_main_action_sort">Sort</string>
@@ -46,5 +56,6 @@
     <string name="credits_string">Retrofit \nhttp://square.github.io/retrofit/  \n\n
     TheMovieAPI \n https://www.themoviedb.org/documentation/api  \n\n
     Picasso \n http://square.github.io/picasso/</string>
-    <string name="menu_main_action_favorites">Favorites</string>
+    <string name="menu_share">Share</string>
+
 </resources>

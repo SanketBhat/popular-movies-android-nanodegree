@@ -18,7 +18,7 @@ package com.udacity.sanketbhat.popularmovies.model;
 
 import com.google.gson.annotations.SerializedName;
 
-class Genre {
+public class Genre {
 
     @SerializedName("id")
     private int id;

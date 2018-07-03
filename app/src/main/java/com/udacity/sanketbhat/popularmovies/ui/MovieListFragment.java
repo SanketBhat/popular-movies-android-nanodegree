@@ -16,7 +16,6 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -32,21 +31,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.adapter.ItemClickListener;
+import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener;
 import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager;
-import com.udacity.sanketbhat.popularmovies.adapter.RecyclerViewAdapter;
+import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter;
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFragmentBinding;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.SortOrder;
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
-
-import java.util.List;
 
 public class MovieListFragment extends Fragment {
     private MovieListViewModel viewModel;
     private ActivityMovieListFragmentBinding mBinding;
     private MovieGridLayoutManager gridLayoutManager;
-    private RecyclerViewAdapter adapter;
+    private MovieListAdapter adapter;
 
 
     @Override
@@ -66,12 +62,7 @@ public class MovieListFragment extends Fragment {
         mBinding = DataBindingUtil.bind(rootView);
         if (mBinding != null) {
             setupRecyclerView(mBinding.movieList);
-            mBinding.movieListErrorRetryButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    loadFirstPage(true);
-                }
-            });
+            mBinding.movieListErrorRetryButton.setOnClickListener(v -> loadFirstPage(true));
             loadFirstPage(false);
             observeViewModel();
         }
@@ -84,11 +75,11 @@ public class MovieListFragment extends Fragment {
             int sortOrder = PreferenceUtils.getPreferredSortOrder(getActivity().getApplicationContext());
             switch (sortOrder) {
                 case SortOrder.SORT_ORDER_POPULAR:
-                    getActivity().setTitle("Popular Movies");
+                    getActivity().setTitle(getString(R.string.title_popular_movie));
                     break;
 
                 case SortOrder.SORT_ORDER_TOP_RATED:
-                    getActivity().setTitle("Top Rated Movies");
+                    getActivity().setTitle(getString(R.string.title_top_rated_movie));
                     break;
 
                 default:
@@ -114,7 +105,7 @@ public class MovieListFragment extends Fragment {
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         //Initialize adapter with null movie items. Because it will be set once it is available
 
-        adapter = new RecyclerViewAdapter(getContext(), null, (ItemClickListener) getActivity());
+        adapter = new MovieListAdapter(getContext(), null, (MovieClickListener) getActivity());
         recyclerView.setAdapter(adapter);
 
         //Set the gridLayoutManager with span count calculated dynamically
@@ -136,33 +127,24 @@ public class MovieListFragment extends Fragment {
 
     private void observeViewModel() {
         //Observe loading indicator so that adapter can display loading for next page.
-        viewModel.getLoadingIndicator().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean loading) {
-                if (loading != null) adapter.setLoading(loading);
-            }
+        viewModel.getLoadingIndicator().observe(this, loading -> {
+            if (loading != null) adapter.setLoading(loading);
         });
 
         //Failure indicator for showing error message that user can understand
-        viewModel.getFailureIndicator().observe(this, new Observer<Void>() {
-            @Override
-            public void onChanged(@Nullable Void aVoid) {
-                if (adapter.isLoading()) {
-                    //Error when loading nextPage
-                    Log.i("MovieListActivity", "Error when loading next page");
-                } else if (adapter.getItemCount() == 0) {
-                    showErrorLayout();
-                }
+        viewModel.getFailureIndicator().observe(this, aVoid -> {
+            if (adapter.isLoading()) {
+                //Error when loading nextPage
+                Log.i("MovieListActivity", "Error when loading next page");
+            } else if (adapter.getItemCount() == 0) {
+                showErrorLayout();
             }
         });
 
         //Whenever the movie list changes it notifies the adapter
-        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                showMovieList();
-                adapter.swapMovies(movies);
-            }
+        viewModel.getMovies().observe(this, movies -> {
+            showMovieList();
+            adapter.swapMovies(movies);
         });
     }
 
@@ -197,12 +179,7 @@ public class MovieListFragment extends Fragment {
             final int lastVisiblePosition = gridLayoutManager.findLastVisibleItemPosition();
 
             if ((visibleItemCount + lastVisiblePosition + 4) >= itemCount && !viewModel.isLastPage()) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        viewModel.getNextPage();
-                    }
-                });
+                handler.post(() -> viewModel.getNextPage());
             }
         }
     }

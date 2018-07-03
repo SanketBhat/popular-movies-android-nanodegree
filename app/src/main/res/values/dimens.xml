@@ -37,7 +37,6 @@
     <dimen name="movie_list_error_layout_image_width">200dp</dimen>
     <dimen name="movie_list_error_layout_image_height">200dp</dimen>
     <dimen name="movie_list_two_pane_margin">8dp</dimen>
-    <dimen name="movie_list_two_pane_recycler_view_margin">8dp</dimen>
 
     <!--movie detail-->
     <dimen name="movie_detail_card_view_margin">4dp</dimen>

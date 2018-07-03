@@ -59,9 +59,8 @@ public class Dependencies {
         if (movieDao == null) {
             //Use application context
             movieDao = Room.databaseBuilder(context.getApplicationContext(), MovieDatabase.class, "movies.db")
-                    //TODO:Allow MainThread Queries for testing only. Removing this ASAP.
-                    .allowMainThreadQueries()
-                    .build().getMovieDao();
+                    .build()
+                    .getMovieDao();
         }
         return movieDao;
     }

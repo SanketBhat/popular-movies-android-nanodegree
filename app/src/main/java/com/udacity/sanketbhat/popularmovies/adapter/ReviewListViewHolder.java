@@ -16,10 +16,18 @@
 
 package com.udacity.sanketbhat.popularmovies.adapter;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
-import com.udacity.sanketbhat.popularmovies.model.Movie;
+import com.udacity.sanketbhat.popularmovies.R;
 
-public interface ItemClickListener {
-    void onClickItem(View v, Movie movie);
+public class ReviewListViewHolder extends RecyclerView.ViewHolder {
+    public TextView review, author;
+
+    ReviewListViewHolder(View itemView) {
+        super(itemView);
+        review = itemView.findViewById(R.id.movieReviewText);
+        author = itemView.findViewById(R.id.movieReviewAuthor);
+    }
 }

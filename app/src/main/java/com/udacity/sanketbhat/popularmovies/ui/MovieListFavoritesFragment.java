@@ -16,12 +16,10 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,17 +28,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.adapter.ItemClickListener;
+import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener;
 import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager;
-import com.udacity.sanketbhat.popularmovies.adapter.RecyclerViewAdapter;
+import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter;
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFavoritesBinding;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-
-import java.util.List;
 
 public class MovieListFavoritesFragment extends Fragment {
 
-    private ActivityMovieListFavoritesBinding mBinding;
     private MovieListViewModel viewModel;
 
     public MovieListFavoritesFragment() {
@@ -63,20 +57,16 @@ public class MovieListFavoritesFragment extends Fragment {
         if (getActivity() != null) getActivity().setTitle("Favorites");
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.activity_movie_list_favorites, container, false);
-        mBinding = DataBindingUtil.bind(rootView);
-        final RecyclerViewAdapter adapter = new RecyclerViewAdapter(getContext(), null, (ItemClickListener) getActivity());
+        ActivityMovieListFavoritesBinding mBinding = DataBindingUtil.bind(rootView);
 
-        MovieGridLayoutManager gridLayoutManager = new MovieGridLayoutManager(getContext(), adapter);
-        mBinding.favoritesMovieList.setLayoutManager(gridLayoutManager);
-        mBinding.favoritesMovieList.setAdapter(adapter);
-        viewModel.getFavorites().observe(this, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                adapter.swapMovies(movies);
-            }
-        });
+        if (mBinding != null) {
+            final MovieListAdapter adapter = new MovieListAdapter(getContext(), null, (MovieClickListener) getActivity());
+            MovieGridLayoutManager gridLayoutManager = new MovieGridLayoutManager(getContext(), adapter);
+            mBinding.favoritesMovieList.setLayoutManager(gridLayoutManager);
+            mBinding.favoritesMovieList.setAdapter(adapter);
+            viewModel.getFavorites().observe(this, adapter::swapMovies);
+        }
         return rootView;
-
     }
 
     @Override
