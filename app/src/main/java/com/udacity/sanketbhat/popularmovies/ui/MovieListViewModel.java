@@ -16,33 +16,24 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
-import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
+import com.udacity.sanketbhat.popularmovies.MovieRepository;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.PageResponse;
 import com.udacity.sanketbhat.popularmovies.model.SortOrder;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MovieListViewModel extends ViewModel {
-
-    //Connection timeouts for network calls
-    private static final int CONNECTION_TIMEOUT = 10000;
-    private static final int READ_TIMEOUT = 15000;
-
-    //Scroll threshold to implement endless list
-    private static final int SCROLL_THRESHOLD = 4;
+public class MovieListViewModel extends AndroidViewModel {
 
     //page numbers for the correct pagination
     private int currentPage = 0;
@@ -52,27 +43,25 @@ public class MovieListViewModel extends ViewModel {
     private MutableLiveData<List<Movie>> movies;
     private MutableLiveData<Void> failureIndicator;
     private MutableLiveData<Boolean> loadingIndicator;
+    private LiveData<List<Movie>> favorites;
 
     private int sortOrder;
-    private TheMovieDBApiService service;
+    private MovieRepository repo;
 
 
-    public MovieListViewModel() {
+    public MovieListViewModel(Application application) {
+        super(application);
         initialize();
     }
 
     //Initialize data/objects
     private void initialize() {
-        if (movies == null) movies = new MutableLiveData<>();
-
-        if (service == null) service = getTheMovieDBApiService();
-
-        if (failureIndicator == null) failureIndicator = new MutableLiveData<>();
-
-        if (loadingIndicator == null) {
-            loadingIndicator = new MutableLiveData<>();
-            loadingIndicator.setValue(false);
-        }
+        repo = MovieRepository.getInstance(getApplication().getApplicationContext());
+        movies = new MutableLiveData<>();
+        failureIndicator = new MutableLiveData<>();
+        loadingIndicator = new MutableLiveData<>();
+        loadingIndicator.setValue(false);
+        favorites = repo.getFavorites();
     }
 
     /**
@@ -84,14 +73,12 @@ public class MovieListViewModel extends ViewModel {
      *                  list even if it already exist
      */
     public void getFirstPage(int sortOrder, boolean retrying) {
-
         //It implies it is called by configuration changes, just return.
         if (this.sortOrder == sortOrder && !retrying) return;
 
         //It is intentionally called, proceed with loading first page
         this.sortOrder = sortOrder;
-        Call<PageResponse> call = service.getFirstPage(SortOrder.getSortOrderPath(sortOrder));
-        call.enqueue(new Callback<PageResponse>() {
+        final Callback<PageResponse> pageCallback = new Callback<PageResponse>() {
             @Override
             public void onResponse(@NonNull Call<PageResponse> call, @NonNull Response<PageResponse> response) {
                 if (response.isSuccessful()) {
@@ -113,15 +100,15 @@ public class MovieListViewModel extends ViewModel {
                 //Error layout
                 failureIndicator.setValue(null);
             }
-        });
+        };
+        repo.getFirstPage(SortOrder.getSortOrderPath(sortOrder), pageCallback);
     }
 
-
-    private void getNextPage() {
+    public void getNextPage() {
         if (loadingIndicator.getValue() != null && loadingIndicator.getValue()) return;
 
         loadingIndicator.setValue(true);
-        service.getPage(SortOrder.getSortOrderPath(sortOrder), currentPage + 1).enqueue(new Callback<PageResponse>() {
+        final Callback<PageResponse> pageCallback = new Callback<PageResponse>() {
             @Override
             public void onResponse(@NonNull Call<PageResponse> call, @NonNull Response<PageResponse> response) {
                 loadingIndicator.setValue(false);
@@ -144,8 +131,8 @@ public class MovieListViewModel extends ViewModel {
                 loadingIndicator.setValue(false);
                 failureIndicator.setValue(null);
             }
-        });
-
+        };
+        repo.getNextPage(SortOrder.getSortOrderPath(sortOrder), currentPage + 1, pageCallback);
     }
 
     public MutableLiveData<Void> getFailureIndicator() {
@@ -160,29 +147,11 @@ public class MovieListViewModel extends ViewModel {
         return loadingIndicator;
     }
 
-    //Build retrofit library components and obtain service object
-    private TheMovieDBApiService getTheMovieDBApiService() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS)
-                .retryOnConnectionFailure(true)
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("http://api.themoviedb.org/3/movie/")
-                .client(okHttpClient)
-                .build();
-        return retrofit.create(TheMovieDBApiService.class);
+    public LiveData<List<Movie>> getFavorites() {
+        return favorites;
     }
 
-    private boolean isLastPage() {
+    public boolean isLastPage() {
         return currentPage >= totalPage;
-    }
-
-    //Trigger getNextPage() call if user is reaching end of the list
-    public void movieListScrolled(int visibleItemCount, int lastVisiblePosition, int totalCount) {
-        if ((visibleItemCount + lastVisiblePosition + SCROLL_THRESHOLD) >= totalCount && !isLastPage()) {
-            getNextPage();
-        }
     }
 }

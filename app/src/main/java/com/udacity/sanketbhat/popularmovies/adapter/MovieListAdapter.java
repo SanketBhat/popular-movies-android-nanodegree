@@ -33,7 +33,7 @@ import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter {
+public class MovieListAdapter extends RecyclerView.Adapter {
 
     //Two view types
     // -> 1. For normal movie grid item.
@@ -41,14 +41,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     public static final int VIEW_TYPE_MOVIE = 1;
     public static final int VIEW_TYPE_PROGRESS = 2;
 
-    private final ItemClickListener clickListener;
+    private final MovieClickListener clickListener;
     private final Context mContext;
     private List<Movie> movies;
 
     //Boolean flag for showing or not showing the loading indicator at the end of the grid.
     private boolean loading = false;
 
-    public RecyclerViewAdapter(Context context, List<Movie> movies, ItemClickListener clickListener) {
+    public MovieListAdapter(Context context, List<Movie> movies, MovieClickListener clickListener) {
         this.movies = movies;
         this.clickListener = clickListener;
         mContext = context;
@@ -78,11 +78,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                 if (holder instanceof ViewHolder) {
                     //Bind view with data
                     final ViewHolder viewHolder = (ViewHolder) holder;
-                    viewHolder.movieGenre.setText(movies.get(position).getGenres());
-                    viewHolder.movieName.setText(movies.get(position).getTitle());
+                    final Movie movie = movies.get(position);
+                    viewHolder.movieGenre.setText(movie.getGenresString());
+                    viewHolder.movieName.setText(movie.getTitle());
                     Picasso.with(mContext)
-                            .load(ImageUrlBuilder.getPosterUrlString(movies.get(position).getPosterPath()))
-                            .tag(MovieListActivity.class)
+                            .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
+                            .tag(MovieListActivity.class.getSimpleName())
                             .error(R.drawable.ic_movie_grid_item_image_error)
                             .placeholder(R.drawable.ic_loading_indicator)
                             .into(viewHolder.moviePoster);
@@ -107,7 +108,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         //If movies = null return 0, or if next page is loading return size of movies + 1
-        //Else its normal to return movies.size()
+        //Else its normal, return movies.size()
         if (movies == null) return 0;
         else if (loading) return movies.size() + 1;
         else return movies.size();
@@ -136,10 +137,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    public interface ItemClickListener {
-        void onClickItem(View v, Movie movie);
-    }
-
+    //ViewHolder for normal movie item.
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView moviePoster;
         final TextView movieName;
@@ -168,6 +166,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
+    //View Holder for progress indicator
     class ProgressViewHolder extends RecyclerView.ViewHolder {
         ProgressViewHolder(View itemView) {
             super(itemView);

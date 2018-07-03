@@ -16,27 +16,35 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
-import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.sanketbhat.popularmovies.R;
+import com.udacity.sanketbhat.popularmovies.adapter.ReviewListAdapter;
+import com.udacity.sanketbhat.popularmovies.adapter.VideoClickListener;
+import com.udacity.sanketbhat.popularmovies.adapter.VideoListAdapter;
+import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieDetailContentBinding;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
+import com.udacity.sanketbhat.popularmovies.model.Video;
 import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -44,10 +52,14 @@ import java.util.Locale;
  * in two-pane mode (on tablets) or a {@link MovieDetailActivity}
  * on handsets.
  */
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements VideoClickListener {
 
+    public static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
     public static final String ARG_ITEM = "movieItem";
     private Movie movie;
+    private MovieDetailViewModel viewModel;
+    private boolean isFavorite;
+    private Menu optionMenu;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,9 +72,14 @@ public class MovieDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         if (getArguments() != null && getArguments().containsKey(ARG_ITEM)) {
             movie = getArguments().getParcelable(ARG_ITEM);
         }
+
+        if (getContext() != null)
+            viewModel = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
     }
 
 
@@ -71,51 +88,98 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.activity_movie_detail_content, container, false);
-        rootView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                        getActivity() != null &&
-                        getActivity().getClass() == MovieDetailActivity.class) {
-                    //Start shared transition on Lollipop and higher devices.
-                    getActivity().startPostponedEnterTransition();
-                }
-                return true;
+        ActivityMovieDetailContentBinding mBinding = DataBindingUtil.bind(rootView);
+        rootView.getViewTreeObserver().addOnPreDrawListener(() -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+                    getActivity() != null &&
+                    getActivity().getClass() == MovieDetailActivity.class) {
+                //Start shared transition on Lollipop and higher devices.
+                getActivity().startPostponedEnterTransition();
             }
+            return true;
         });
 
-        if (movie != null) {
-            //Getting view instances
-            ImageView posterImage = rootView.findViewById(R.id.movieDetailPoster);
-            TextView title = rootView.findViewById(R.id.movieDetailName);
-            TextView genre = rootView.findViewById(R.id.movieDetailGenre);
-            TextView plot = rootView.findViewById(R.id.movieDetailPlotSynopsis);
-            TextView releaseDate = rootView.findViewById(R.id.movieDetailReleaseDate);
-            TextView ratingText = rootView.findViewById(R.id.movieDetailRatingText);
-
+        if (movie != null && mBinding != null && getContext() != null) {
             //Loading views with data
             Picasso.with(getContext())
                     .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
-                    .into(posterImage);
-            title.setText(movie.getTitle());
-            genre.setText(movie.getGenres());
-            plot.setText(movie.getOverview());
+                    .into(mBinding.movieDetailPoster);
+            mBinding.setMovie(movie);
 
-            try {
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = simpleDateFormat.parse(movie.getReleaseDate());
-                String dateText = SimpleDateFormat.getDateInstance().format(date);
-                releaseDate.setText(dateText);
-            } catch (ParseException e) {
-                releaseDate.setText(R.string.movie_detail_date_error);
-                e.printStackTrace();
-            }
+            mBinding.buttonFavorites.setOnClickListener((v) -> {
+                if (isFavorite) viewModel.removeFromFavorites(movie);
+                else viewModel.insertIntoFavorites(movie);
+            });
 
-            float rating = (float) (movie.getVoteAverage() / 2.0f);
-            String ratingString = String.format(Locale.getDefault(), getString(R.string.movie_detail_average_rating_string), rating);
-            ratingText.setText(ratingString);
+            final VideoListAdapter videoListAdapter = new VideoListAdapter(getContext(), this);
+            videoListAdapter.setShowLoading(true);
+            mBinding.videosList.setAdapter(videoListAdapter);
+            mBinding.videosList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+            final ReviewListAdapter reviewListAdapter = new ReviewListAdapter();
+            reviewListAdapter.setShowLoading(true);
+            mBinding.reviewsList.setAdapter(reviewListAdapter);
+            mBinding.reviewsList.setNestedScrollingEnabled(false);
+            mBinding.reviewsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
+            viewModel.isFavorite(movie.getId()).observe(this, movie1 -> {
+                isFavorite = movie1 != null;
+                if (isFavorite)
+                    mBinding.buttonFavorites.setImageResource(R.drawable.ic_favorite_white);
+                else mBinding.buttonFavorites.setImageResource(R.drawable.ic_favorite_border_white);
+            });
+
+            viewModel.getMovie(movie.getId()).observe(this, movie -> {
+                videoListAdapter.setContentList(movie == null ? null : movie.getVideos());
+                reviewListAdapter.setContentList(movie == null ? null : movie.getReviews());
+                if (movie != null && movie.getReviewResponse() != null && movie.getVideoResponse() != null) {
+                    this.movie.setVideoResponse(movie.getVideoResponse());
+                    this.movie.setReviewResponse(movie.getReviewResponse());
+                    List<Video> videos = movie.getVideos();
+                    if (videos != null && videos.size() > 0 && videos.get(0).getSite().equalsIgnoreCase("youtube")) {
+                        //Enable sharing for first trailer
+                        optionMenu.findItem(R.id.action_share).setVisible(true);
+                    }
+                }
+            });
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+        optionMenu = menu;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            if (getActivity() != null
+                    && movie.getVideos() != null
+                    && movie.getVideos().size() > 0
+                    && movie.getVideos().get(0).getSite().equalsIgnoreCase("youtube")) {
+                String url = YOUTUBE_LINK_TEMPLATE + movie.getVideos().get(0).getKey();
+                String textToShare = "Here is an awesome movie I found, watch the trailer " +
+                        url + " . Explore popular movies list using app 'Pop Moviez' :)";
+                ShareCompat.IntentBuilder.from(getActivity())
+                        .setText(textToShare)
+                        .setChooserTitle("Choose the app to share")
+                        .setType("text/plain")
+                        .startChooser();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onVideoClicked(Video video) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_LINK_TEMPLATE + video.getKey()));
+        if (getContext() != null && getContext().getPackageManager().resolveActivity(intent, 0) != null) {
+            startActivity(intent);
+            return;
+        }
+        Toast.makeText(getContext(), R.string.video_clicked_no_app_error, Toast.LENGTH_SHORT).show();
     }
 }

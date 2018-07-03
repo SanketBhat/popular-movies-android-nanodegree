@@ -15,7 +15,6 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,31 +32,10 @@
     
     -->
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/movie_list_container"
         android:layout_width="@dimen/movie_list_two_pane_list_width"
-        android:layout_height="match_parent"
-        android:background="#e0e0e0">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/movie_list"
-            android:name="com.udacity.sanketbhat.popularmovies.MovieListFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/movie_list_two_pane_recycler_view_margin"
-            android:layout_marginRight="@dimen/movie_list_two_pane_recycler_view_margin"
-            app:layoutManager="android.support.v7.widget.GridLayoutManager"
-            tools:context="com.udacity.sanketbhat.popularmovies.ui.MovieListActivity"
-            tools:listitem="@layout/movie_grid_item" />
-
-        <ProgressBar
-            android:id="@+id/movie_load_progress"
-            style="@style/Widget.AppCompat.ProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true" />
-
-        <include layout="@layout/activity_movie_list_error" />
     </FrameLayout>
 
     <FrameLayout

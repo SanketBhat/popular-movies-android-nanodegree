@@ -14,20 +14,23 @@
  *    limitations under the License.
  */
 
-package com.udacity.sanketbhat.popularmovies;
+package com.udacity.sanketbhat.popularmovies.model;
 
-import org.junit.Test;
+import com.google.gson.annotations.SerializedName;
 
-import static org.junit.Assert.assertEquals;
+import java.util.List;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+public class VideoResponse {
+
+    @SerializedName("results")
+    private List<Video> videos;
+
+    public List<Video> getVideos() {
+        return videos;
     }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
 }

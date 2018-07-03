@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-package com.udacity.sanketbhat.popularmovies;
+package com.udacity.sanketbhat.popularmovies.adapter;
 
-import org.junit.Test;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
-import static org.junit.Assert.assertEquals;
+import com.udacity.sanketbhat.popularmovies.R;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+class EmptyViewHolder extends RecyclerView.ViewHolder {
+    EmptyViewHolder(View itemView, String text) {
+        super(itemView);
+        //Show the empty content message in a textView
+        ((TextView) itemView.findViewById(R.id.empty_text_view)).setText(text);
     }
 }
