@@ -16,6 +16,7 @@
 
 package com.udacity.sanketbhat.popularmovies.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -44,6 +45,15 @@ public abstract class RecyclerViewAdapterTemplate<VH extends RecyclerView.ViewHo
     private List<T> contents;
     private boolean showLoading;
     private boolean showEmpty;
+    private Context mContext;
+
+    RecyclerViewAdapterTemplate(Context mContext) {
+        this.mContext = mContext;
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
 
     @Override
     public int getItemViewType(int position) {

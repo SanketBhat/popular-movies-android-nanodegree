@@ -36,6 +36,7 @@ public class VideoListAdapter extends RecyclerViewAdapterTemplate<VideoListViewH
     private Context mContext;
 
     public VideoListAdapter(@NonNull Context context, @NonNull VideoClickListener clickListener) {
+        super(context);
         mContext = context;
         this.clickListener = clickListener;
     }

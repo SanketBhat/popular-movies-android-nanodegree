@@ -25,12 +25,14 @@ import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Review;
 
 public class ReviewListAdapter extends RecyclerViewAdapterTemplate<ReviewListViewHolder, Review> {
-    private Context context;
+
+    public ReviewListAdapter(Context mContext) {
+        super(mContext);
+    }
 
     @Override
     ReviewListViewHolder getNormalViewHolder(ViewGroup parent) {
-        context = parent.getContext();
-        View rootView = LayoutInflater.from(context).inflate(R.layout.movie_review_item, parent, false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_review_item, parent, false);
         return new ReviewListViewHolder(rootView);
     }
 
@@ -43,6 +45,6 @@ public class ReviewListAdapter extends RecyclerViewAdapterTemplate<ReviewListVie
 
     @Override
     String getEmptyLayoutMessage() {
-        return context.getString(R.string.empty_list_message);
+        return getContext().getString(R.string.empty_list_message);
     }
 }

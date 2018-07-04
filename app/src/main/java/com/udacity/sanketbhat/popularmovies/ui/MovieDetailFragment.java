@@ -116,7 +116,7 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
             mBinding.videosList.setAdapter(videoListAdapter);
             mBinding.videosList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
-            final ReviewListAdapter reviewListAdapter = new ReviewListAdapter();
+            final ReviewListAdapter reviewListAdapter = new ReviewListAdapter(getContext());
             reviewListAdapter.setShowLoading(true);
             mBinding.reviewsList.setAdapter(reviewListAdapter);
             mBinding.reviewsList.setNestedScrollingEnabled(false);
