@@ -27,7 +27,7 @@ import android.util.DisplayMetrics;
  */
 public class MovieGridLayoutManager extends GridLayoutManager {
     private static final int SINGLE_GRID_ITEM_WIDTH = 160;
-    private int movieItemSpanCount;
+    private final int movieItemSpanCount;
     private static final int TWO_PANE_SPAN_SIZE = 2;
     private static final int TWO_PANE_MINIMUM_SIZE = 720;
 
@@ -54,7 +54,7 @@ public class MovieGridLayoutManager extends GridLayoutManager {
 
     class MovieSpanSizeLookup extends GridLayoutManager.SpanSizeLookup {
 
-        private MovieListAdapter mAdapter;
+        private final MovieListAdapter mAdapter;
 
         MovieSpanSizeLookup(MovieListAdapter adapter) {
             this.mAdapter = adapter;

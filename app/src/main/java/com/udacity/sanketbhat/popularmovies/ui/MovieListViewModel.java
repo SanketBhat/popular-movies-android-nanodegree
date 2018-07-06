@@ -33,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MovieListViewModel extends AndroidViewModel {
+class MovieListViewModel extends AndroidViewModel {
 
     //page numbers for the correct pagination
     private int currentPage = 0;

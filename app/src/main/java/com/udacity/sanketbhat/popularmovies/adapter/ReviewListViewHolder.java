@@ -22,8 +22,9 @@ import android.widget.TextView;
 
 import com.udacity.sanketbhat.popularmovies.R;
 
-public class ReviewListViewHolder extends RecyclerView.ViewHolder {
-    public TextView review, author;
+class ReviewListViewHolder extends RecyclerView.ViewHolder {
+    public final TextView review;
+    public final TextView author;
 
     ReviewListViewHolder(View itemView) {
         super(itemView);

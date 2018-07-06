@@ -19,6 +19,10 @@ package com.udacity.sanketbhat.popularmovies.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+/**
+ * Class used for showing progress indicator when videoList or
+ * reviewList is loading
+ */
 class ProgressViewHolder extends RecyclerView.ViewHolder {
     ProgressViewHolder(View itemView) {
         super(itemView);

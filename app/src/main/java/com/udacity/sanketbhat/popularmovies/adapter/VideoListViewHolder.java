@@ -22,8 +22,8 @@ import android.widget.ImageView;
 
 import com.udacity.sanketbhat.popularmovies.R;
 
-public class VideoListViewHolder extends RecyclerView.ViewHolder {
-    public ImageView videoThumbnail;
+class VideoListViewHolder extends RecyclerView.ViewHolder {
+    public final ImageView videoThumbnail;
 
     VideoListViewHolder(View itemView) {
         super(itemView);

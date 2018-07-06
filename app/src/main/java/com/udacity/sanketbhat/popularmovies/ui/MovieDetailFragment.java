@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +46,7 @@ import com.udacity.sanketbhat.popularmovies.model.Video;
 import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -54,7 +56,7 @@ import java.util.List;
  */
 public class MovieDetailFragment extends Fragment implements VideoClickListener {
 
-    public static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
+    private static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
     public static final String ARG_ITEM = "movieItem";
     private Movie movie;
     private MovieDetailViewModel viewModel;
@@ -135,22 +137,34 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
                 if (movie != null && movie.getReviewResponse() != null && movie.getVideoResponse() != null) {
                     this.movie.setVideoResponse(movie.getVideoResponse());
                     this.movie.setReviewResponse(movie.getReviewResponse());
-                    List<Video> videos = movie.getVideos();
-                    if (videos != null && videos.size() > 0 && videos.get(0).getSite().equalsIgnoreCase("youtube")) {
-                        //Enable sharing for first trailer
-                        optionMenu.findItem(R.id.action_share).setVisible(true);
-                    }
+                    setupShareButton();
                 }
             });
-        }
+        } else Log.i(this.getClass().getSimpleName(), "Can't bind data. movie/context is null!");
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (optionMenu != null) optionMenu.clear();
+        super.onDestroy();
+    }
+
+    private void setupShareButton() {
+        List<Video> videos = movie.getVideos();
+        if (videos != null && videos.size() > 0 && videos.get(0).getSite().equalsIgnoreCase("youtube")) {
+            //Enable sharing for first trailer
+            if (optionMenu != null && optionMenu.findItem(R.id.action_share) != null)
+                optionMenu.findItem(R.id.action_share).setVisible(true);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_detail, menu);
         optionMenu = menu;
+        setupShareButton();
     }
 
     @Override
@@ -161,11 +175,10 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
                     && movie.getVideos().size() > 0
                     && movie.getVideos().get(0).getSite().equalsIgnoreCase("youtube")) {
                 String url = YOUTUBE_LINK_TEMPLATE + movie.getVideos().get(0).getKey();
-                String textToShare = "Here is an awesome movie I found, watch the trailer " +
-                        url + " . Explore popular movies list using app 'Pop Moviez' :)";
+                String textToShare = String.format(Locale.getDefault(), getString(R.string.share_text_template), url);
                 ShareCompat.IntentBuilder.from(getActivity())
                         .setText(textToShare)
-                        .setChooserTitle("Choose the app to share")
+                        .setChooserTitle(R.string.intent_chooser_title)
                         .setType("text/plain")
                         .startChooser();
             }

@@ -24,9 +24,9 @@ import android.arch.lifecycle.MutableLiveData;
 import com.udacity.sanketbhat.popularmovies.MovieRepository;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 
-public class MovieDetailViewModel extends AndroidViewModel {
-    private MutableLiveData<Movie> movie;
-    private MovieRepository repo;
+class MovieDetailViewModel extends AndroidViewModel {
+    private final MutableLiveData<Movie> movie;
+    private final MovieRepository repo;
 
     public MovieDetailViewModel(Application application) {
         super(application);
@@ -43,7 +43,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 && movie.getValue().getId() == id
                 && movie.getValue().getVideoResponse() != null
                 && movie.getValue().getReviewResponse() != null) return movie;
-        repo.getMovie(id, responseMovie -> movie.postValue(responseMovie));
+        repo.getMovie(id, movie::postValue);
         return movie;
     }
 

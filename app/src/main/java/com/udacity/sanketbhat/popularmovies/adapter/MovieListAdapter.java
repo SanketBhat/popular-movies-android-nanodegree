@@ -127,11 +127,14 @@ public class MovieListAdapter extends RecyclerView.Adapter {
 
     public void setLoading(boolean loading) {
         if (this.loading != loading) {
+            //If loading is finished due to error or successful response-
+            //notify the list to hide the loading indicator
             this.loading = loading;
             notifyDataSetChanged();
         }
     }
 
+    //Swap the new available list with the current one
     public void swapMovies(List<Movie> movies) {
         this.movies = movies;
         notifyDataSetChanged();

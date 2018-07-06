@@ -77,7 +77,6 @@
         android:id="@+id/movieDetailContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_overlapTop="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     </android.support.v4.widget.NestedScrollView>

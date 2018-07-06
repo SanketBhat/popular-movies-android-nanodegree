@@ -20,7 +20,10 @@ import android.view.View;
 
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 
-//OnClick Listener for Movie item
+/**
+ * Event listener for movie item click event
+ */
 public interface MovieClickListener {
+    //OnClick Listener for Movie item
     void onClickItem(View v, Movie movie);
 }

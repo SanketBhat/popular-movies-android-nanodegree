@@ -45,13 +45,13 @@ public abstract class RecyclerViewAdapterTemplate<VH extends RecyclerView.ViewHo
     private List<T> contents;
     private boolean showLoading;
     private boolean showEmpty;
-    private Context mContext;
+    private final Context mContext;
 
     RecyclerViewAdapterTemplate(Context mContext) {
         this.mContext = mContext;
     }
 
-    public Context getContext() {
+    Context getContext() {
         return mContext;
     }
 
@@ -114,6 +114,11 @@ public abstract class RecyclerViewAdapterTemplate<VH extends RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    /**
+     * Method for getting content list
+     *
+     * @return returns the list of object of type <code>T</code>
+     */
     List<T> getContents() {
         return contents;
     }
@@ -123,9 +128,30 @@ public abstract class RecyclerViewAdapterTemplate<VH extends RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    /**
+     * Method for implementing custom view holder for normal scenario
+     * it should return the view holder of type VH, that should be inflated and
+     * constructed with normal view that should be shown to bind the data.
+     * <p>
+     * Called when content list one or more items
+     *
+     * @param parent View Group parent item, the view should be inflated for this
+     * @return Normal View Holder to show list of contents
+     */
     abstract VH getNormalViewHolder(ViewGroup parent);
 
+    /**
+     * This method should bind the data with the views
+     * viewHolder of type VH. The data object can be accessed using
+     * position and function getContents()
+     * @param holder viewHolder of type VH
+     * @param position position of the viewHolder in the list
+     */
     abstract void normalBinding(VH holder, int position);
 
+    /**
+     * @return It should return String message that should be shown when no items
+     * are present
+     */
     abstract String getEmptyLayoutMessage();
 }

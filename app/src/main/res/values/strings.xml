@@ -35,7 +35,8 @@
     <string name="movie_details_video_play_button">Play Button</string>
     <string name="empty_list_message">No reviews!</string>
     <string name="video_list_empty_message">No videos!</string>
-
+    <string name="intent_chooser_title">Choose the app to share</string>
+    <string name="review_author_template">- %s</string>
 
     <!--Movie List-->
     <string name="movie_list_error_layout_error_message">Oops, An error occurred!</string>
@@ -50,12 +51,13 @@
     <!--Menu-->
     <string name="menu_main_action_sort">Sort</string>
     <string name="menu_main_option_popular_movies">Most Popular</string>
-    <string name="menu_main_option_top_rated">Highest Rated</string>
+    <string name="menu_main_option_top_rated">Top Rated</string>
     <string name="menu_main_credits">Credits</string>
     <string name="credit_dialog_button">OK</string>
     <string name="credits_string">Retrofit \nhttp://square.github.io/retrofit/  \n\n
     TheMovieAPI \n https://www.themoviedb.org/documentation/api  \n\n
     Picasso \n http://square.github.io/picasso/</string>
     <string name="menu_share">Share</string>
+    <string name="share_text_template">Here is an awesome movie I found, watch the trailer %s .Explore popular movies list using app \'Pop Moviez\' :)</string>
 
 </resources>

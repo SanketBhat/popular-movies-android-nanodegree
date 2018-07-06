@@ -22,6 +22,9 @@ import android.widget.TextView;
 
 import com.udacity.sanketbhat.popularmovies.R;
 
+/**
+ * Class for showing empty message when there are no videos or reviews for a movie
+ */
 class EmptyViewHolder extends RecyclerView.ViewHolder {
     EmptyViewHolder(View itemView, String text) {
         super(itemView);

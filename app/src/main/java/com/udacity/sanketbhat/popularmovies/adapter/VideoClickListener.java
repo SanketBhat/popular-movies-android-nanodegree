@@ -18,6 +18,9 @@ package com.udacity.sanketbhat.popularmovies.adapter;
 
 import com.udacity.sanketbhat.popularmovies.model.Video;
 
+/**
+ * Class for handling the click events of the video in the detail view
+ */
 public interface VideoClickListener {
     void onVideoClicked(Video video);
 }

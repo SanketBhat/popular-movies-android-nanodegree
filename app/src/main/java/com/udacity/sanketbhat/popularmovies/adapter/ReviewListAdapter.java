@@ -24,6 +24,8 @@ import android.view.ViewGroup;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Review;
 
+import java.util.Locale;
+
 public class ReviewListAdapter extends RecyclerViewAdapterTemplate<ReviewListViewHolder, Review> {
 
     public ReviewListAdapter(Context mContext) {
@@ -40,7 +42,9 @@ public class ReviewListAdapter extends RecyclerViewAdapterTemplate<ReviewListVie
     void normalBinding(ReviewListViewHolder holder, int position) {
         Review review = getContents().get(position);
         holder.review.setText(review.getContent());
-        holder.author.setText(review.getAuthor());
+        holder.author.setText(String.format(Locale.getDefault(),
+                getContext().getString(R.string.review_author_template),
+                review.getAuthor()));
     }
 
     @Override

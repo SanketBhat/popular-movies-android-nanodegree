@@ -38,9 +38,9 @@ public class MovieRepository {
 
     private static final Object LOCK = new Object();
     private static MovieRepository movieRepository;
-    private MovieDao movieDao;
-    private TheMovieDBApiService service;
-    private Executor executor;
+    private final MovieDao movieDao;
+    private final TheMovieDBApiService service;
+    private final Executor executor;
 
     private MovieRepository(Context context) {
         executor = Executors.newSingleThreadExecutor();

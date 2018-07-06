@@ -47,7 +47,7 @@ import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
  */
 public class MovieListActivity extends AppCompatActivity implements MovieClickListener, FragmentManager.OnBackStackChangedListener {
 
-    public boolean mTwoPane;
+    private boolean mTwoPane;
     private Menu mOptionMenu;
 
     @Override
@@ -66,7 +66,6 @@ public class MovieListActivity extends AppCompatActivity implements MovieClickLi
         }
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
-
         if (savedInstanceState == null) {
             MovieListFragment fragment = new MovieListFragment();
             getSupportFragmentManager().beginTransaction()

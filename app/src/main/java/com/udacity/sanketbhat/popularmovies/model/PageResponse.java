@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+@SuppressWarnings("unused")//Some methods are used by retrofit API
 public class PageResponse {
 
     @SerializedName("page")

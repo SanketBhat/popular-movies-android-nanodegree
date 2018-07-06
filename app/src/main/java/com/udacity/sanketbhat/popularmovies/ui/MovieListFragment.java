@@ -104,14 +104,10 @@ public class MovieListFragment extends Fragment {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         //Initialize adapter with null movie items. Because it will be set once it is available
-
         adapter = new MovieListAdapter(getContext(), null, (MovieClickListener) getActivity());
         recyclerView.setAdapter(adapter);
 
-        //Set the gridLayoutManager with span count calculated dynamically
-
         gridLayoutManager = new MovieGridLayoutManager(getContext(), adapter);
-
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setHasFixedSize(true);
 
@@ -169,7 +165,7 @@ public class MovieListFragment extends Fragment {
 
     //Custom scroll listener for endless list implementation
     class MovieListScrollListener extends RecyclerView.OnScrollListener {
-        private Handler handler = new Handler();
+        private final Handler handler = new Handler();
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

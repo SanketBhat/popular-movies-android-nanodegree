@@ -32,8 +32,8 @@ public class VideoListAdapter extends RecyclerViewAdapterTemplate<VideoListViewH
 
     private static final String YOUTUBE_THUMBNAIL_TEMPLATE = "http://img.youtube.com/vi/%s/mqdefault.jpg";
     private static final String YOUTUBE_VIDEO_SOURCE = "youtube";
-    private VideoClickListener clickListener;
-    private Context mContext;
+    private final VideoClickListener clickListener;
+    private final Context mContext;
 
     public VideoListAdapter(@NonNull Context context, @NonNull VideoClickListener clickListener) {
         super(context);

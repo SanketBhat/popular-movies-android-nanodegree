@@ -37,13 +37,11 @@ import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
  */
 public class MovieDetailActivity extends AppCompatActivity {
 
-    ActivityMovieDetailBinding mBinding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+        ActivityMovieDetailBinding mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
         setSupportActionBar(mBinding.detailToolbar);
 
         //Postpone transition until fragment inflated.

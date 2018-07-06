@@ -29,13 +29,14 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class Dependencies {
+class Dependencies {
 
     //Connection timeouts for network calls
     private static final int CONNECTION_TIMEOUT = 10000;
     private static final int READ_TIMEOUT = 15000;
     private static TheMovieDBApiService theMovieDBApiService = null;
     private static MovieDao movieDao = null;
+    private static final String DATABASE_NAME = "movies.db";
 
     //Build retrofit library components and obtain service object
     public static synchronized TheMovieDBApiService getTheMovieDBApiService() {
@@ -58,7 +59,7 @@ public class Dependencies {
     public static synchronized MovieDao getMovieDao(Context context) {
         if (movieDao == null) {
             //Use application context
-            movieDao = Room.databaseBuilder(context.getApplicationContext(), MovieDatabase.class, "movies.db")
+            movieDao = Room.databaseBuilder(context.getApplicationContext(), MovieDatabase.class, DATABASE_NAME)
                     .build()
                     .getMovieDao();
         }

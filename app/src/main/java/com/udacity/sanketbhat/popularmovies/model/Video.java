@@ -18,6 +18,7 @@ package com.udacity.sanketbhat.popularmovies.model;
 
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("unused")//Some methods are used by retrofit API
 public class Video {
     @SerializedName("id")
     private String id;

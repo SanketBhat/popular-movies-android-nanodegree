@@ -141,6 +141,12 @@ public class Movie implements Parcelable {
         this.genreIds = genreIds;
     }
 
+    /**
+     * This method returns the string using the Genre object list. If it's null then
+     * it returns the string using the static data of the genre. {@link Genre}
+     *
+     * @return returns the joined Genres of the movie separated by (,) or empty string.
+     */
     public String getGenresString() {
         //If Genre list is not null, return its names
         if (genres != null && genres.size() > 0) {
@@ -190,6 +196,11 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
+    /**
+     * Tries to convert the received date string to local date format. In case of any errors
+     * returns the original date string.
+     * @return date string on of (yyyy-MM-dd) or local date format.
+     */
     public String getDisplayReleaseDate() {
         try {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

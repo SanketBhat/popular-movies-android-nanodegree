@@ -27,7 +27,12 @@ import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
 
 import java.util.List;
 
-public class MovieTypeConverter {
+/**
+ * Class that used by Room Library to save the unsupported types into the database.
+ * The custom types such as Video, Review, Genre are converted to plain JSON String
+ * to store it in the local database.
+ */
+class MovieTypeConverter {
 
     @TypeConverter
     public String genresToString(List<Genre> genres) {
