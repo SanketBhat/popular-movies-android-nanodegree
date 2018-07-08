@@ -1,5 +1,15 @@
 # Popular Movies
 This is second project in the Android Developer Nanodegree, Udacity. I created it from scratch.
+
+##Screenshots
+
+<img src=".art/screenshot1.png" width="50%"/>
+<img src=".art/screenshot2.png" width="50%"/>
+<img src=".art/screenshot3.png" width="50%"/>
+<img src=".art/screenshot4.png" width="75%"/>
+<img src=".art/screenshot5.png" width="75%"/>
+<img src=".art/screenshot6.png" width="95%"/>
+
 ##Features
 - Sort movies based on popularity or top rated
 - User can add movies to his favorites list and can remove them from the list
