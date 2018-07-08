@@ -188,6 +188,7 @@ public class Movie implements Parcelable {
         this.overview = overview;
     }
 
+    @SuppressWarnings("WeakerAccess") //Used by room library implicitly
     public String getReleaseDate() {
         return releaseDate;
     }

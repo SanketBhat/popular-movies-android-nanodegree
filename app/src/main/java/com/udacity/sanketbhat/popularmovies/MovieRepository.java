@@ -101,8 +101,10 @@ public class MovieRepository {
                     if (isFavorite && movieResult != null
                             && movieResult.getVideoResponse() != null
                             && movieResult.getReviewResponse() != null) {
-                        movieDao.updateVideos(id, movieResult.getVideoResponse());
-                        movieDao.updateReviews(id, movieResult.getReviewResponse());
+                        executor.execute(() -> {
+                            movieDao.updateVideos(id, movieResult.getVideoResponse());
+                            movieDao.updateReviews(id, movieResult.getReviewResponse());
+                        });
                     }
                 } else {
                     callback.onResponse(null);

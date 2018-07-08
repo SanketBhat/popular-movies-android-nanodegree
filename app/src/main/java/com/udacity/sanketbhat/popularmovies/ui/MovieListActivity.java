@@ -72,7 +72,6 @@ public class MovieListActivity extends AppCompatActivity implements MovieClickLi
                     .replace(R.id.movie_list_container, fragment)
                     .commit();
         }
-
         onBackStackChanged();
     }
 
@@ -162,6 +161,7 @@ public class MovieListActivity extends AppCompatActivity implements MovieClickLi
             MovieDetailFragment fragment = new MovieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .replace(R.id.movie_detail_container, fragment)
                     .commit();
         } else {

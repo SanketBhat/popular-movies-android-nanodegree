@@ -26,9 +26,7 @@
     <!--movie list grid item-->
     <dimen name="movie_list_grid_item_card_view_elevation">2dp</dimen>
     <dimen name="movie_list_grid_item_layout_margin">2dp</dimen>
-    <dimen name="movie_list_grid_item_poster_width">150dp</dimen>
-    <dimen name="movie_list_grid_item_poster_height">200dp</dimen>
-    <dimen name="movie_list_grid_item_text_width">150dp</dimen>
+    <dimen name="movie_list_grid_item_poster_height">240dp</dimen>
     <dimen name="movie_list_grid_item_card_view_margin">0dp</dimen>
     <dimen name="movie_list_grid_item_text_padding">4dp</dimen>
 

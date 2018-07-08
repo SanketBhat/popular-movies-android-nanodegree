@@ -17,15 +17,21 @@
 package com.udacity.sanketbhat.popularmovies.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.udacity.sanketbhat.popularmovies.R;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.ui.MovieListActivity;
@@ -86,7 +92,7 @@ public class MovieListAdapter extends RecyclerView.Adapter {
                             .tag(MovieListActivity.class.getSimpleName())
                             .error(R.drawable.ic_movie_grid_item_image_error)
                             .placeholder(R.drawable.ic_loading_indicator)
-                            .into(viewHolder.moviePoster);
+                            .into(viewHolder.target);
                 }
                 break;
 
@@ -145,9 +151,45 @@ public class MovieListAdapter extends RecyclerView.Adapter {
         final ImageView moviePoster;
         final TextView movieName;
         final TextView movieGenre;
+        final CardView rootView;
+        private int cardBackground = 0;
+
+        final Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                try {
+                    if (cardBackground == 0) {
+                        Palette.from(bitmap).generate(palette -> {
+                            Palette.Swatch swatch = palette.getVibrantSwatch();
+                            if (swatch != null) {
+                                rootView.setCardBackgroundColor((cardBackground = swatch.getRgb()));
+                                movieName.setTextColor(swatch.getBodyTextColor());
+                                movieGenre.setTextColor(swatch.getTitleTextColor());
+                            }
+                        });
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(mContext, "Error loading cardView background color", Toast.LENGTH_SHORT).show();
+                }
+                moviePoster.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                moviePoster.setImageDrawable(errorDrawable);
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
 
         ViewHolder(View itemView) {
             super(itemView);
+            rootView = (CardView) itemView;
             itemView.setOnClickListener(this);
             moviePoster = itemView.findViewById(R.id.movie_grid_item_image);
             movieName = itemView.findViewById(R.id.movie_grid_item_title);
@@ -166,6 +208,7 @@ public class MovieListAdapter extends RecyclerView.Adapter {
             Picasso.with(moviePoster.getContext())
                     .cancelRequest(moviePoster);
             moviePoster.setImageDrawable(null);
+            cardBackground = 0;
         }
     }
 

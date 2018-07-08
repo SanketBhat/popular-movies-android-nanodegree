@@ -16,6 +16,7 @@
 
 package com.udacity.sanketbhat.popularmovies.ui;
 
+import android.animation.LayoutTransition;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -23,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,8 +58,8 @@ import java.util.Locale;
  */
 public class MovieDetailFragment extends Fragment implements VideoClickListener {
 
-    private static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
     public static final String ARG_ITEM = "movieItem";
+    private static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
     private Movie movie;
     private MovieDetailViewModel viewModel;
     private boolean isFavorite;
@@ -101,10 +103,13 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
             return true;
         });
 
+        ((ConstraintLayout) rootView).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
         if (movie != null && mBinding != null && getContext() != null) {
             //Loading views with data
             Picasso.with(getContext())
                     .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
+                    .error(R.drawable.ic_movie_grid_item_image_error)
                     .into(mBinding.movieDetailPoster);
             mBinding.setMovie(movie);
 
@@ -143,12 +148,6 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
         } else Log.i(this.getClass().getSimpleName(), "Can't bind data. movie/context is null!");
 
         return rootView;
-    }
-
-    @Override
-    public void onDestroy() {
-        if (optionMenu != null) optionMenu.clear();
-        super.onDestroy();
     }
 
     private void setupShareButton() {

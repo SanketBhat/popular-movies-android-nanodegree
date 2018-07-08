@@ -15,8 +15,5 @@
   -->
 
 <resources>
-    <color name="windowBackground">#e0e0e0</color>
-    <color name="colorPrimary">#F44336</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorAccent">#448AFF</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>

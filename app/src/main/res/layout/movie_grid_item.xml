@@ -24,7 +24,7 @@
     card_view:cardElevation="@dimen/movie_list_grid_item_card_view_elevation">
 
     <LinearLayout xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="@dimen/movie_list_grid_item_layout_margin"
@@ -33,7 +33,7 @@
 
         <ImageView
             android:id="@+id/movie_grid_item_image"
-            android:layout_width="@dimen/movie_list_grid_item_poster_width"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/movie_list_grid_item_poster_height"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/list_item_image_desc"
@@ -43,7 +43,7 @@
 
         <TextView
             android:id="@+id/movie_grid_item_title"
-            android:layout_width="@dimen/movie_list_grid_item_text_width"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
@@ -54,7 +54,7 @@
 
         <TextView
             android:id="@+id/movie_grid_item_genre"
-            android:layout_width="@dimen/movie_list_grid_item_text_width"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
