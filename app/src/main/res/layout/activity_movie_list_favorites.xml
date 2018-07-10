@@ -31,6 +31,18 @@
             tools:context=".ui.MovieListActivity"
             tools:listitem="@layout/movie_grid_item" />
 
+        <TextView
+            android:id="@+id/emptyFavoritesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/movie_list_favorites_empty_message"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
+            android:textStyle="italic" />
+
     </FrameLayout>
 
 </layout>

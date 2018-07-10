@@ -24,7 +24,8 @@ import android.arch.lifecycle.MutableLiveData;
 import com.udacity.sanketbhat.popularmovies.MovieRepository;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 
-class MovieDetailViewModel extends AndroidViewModel {
+@SuppressWarnings("WeakerAccess") //Accessed by android library
+public class MovieDetailViewModel extends AndroidViewModel {
     private final MutableLiveData<Movie> movie;
     private final MovieRepository repo;
 

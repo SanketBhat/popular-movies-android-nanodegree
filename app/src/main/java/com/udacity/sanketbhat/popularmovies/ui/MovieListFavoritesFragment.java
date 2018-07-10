@@ -64,7 +64,13 @@ public class MovieListFavoritesFragment extends Fragment {
             MovieGridLayoutManager gridLayoutManager = new MovieGridLayoutManager(getContext(), adapter);
             mBinding.favoritesMovieList.setLayoutManager(gridLayoutManager);
             mBinding.favoritesMovieList.setAdapter(adapter);
-            viewModel.getFavorites().observe(this, adapter::swapMovies);
+            viewModel.getFavorites().observe(this, movies -> {
+                adapter.swapMovies(movies);
+                if (movies != null && movies.size() > 0)
+                    mBinding.emptyFavoritesTextView.setVisibility(View.GONE);
+                else
+                    mBinding.emptyFavoritesTextView.setVisibility(View.VISIBLE);
+            });
         }
         return rootView;
     }

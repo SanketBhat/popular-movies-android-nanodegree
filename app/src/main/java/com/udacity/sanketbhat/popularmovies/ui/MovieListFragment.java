@@ -44,6 +44,9 @@ public class MovieListFragment extends Fragment {
     private MovieGridLayoutManager gridLayoutManager;
     private MovieListAdapter adapter;
 
+    public MovieListFragment() {
+        //Required public constructor
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -33,7 +33,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-class MovieListViewModel extends AndroidViewModel {
+@SuppressWarnings("WeakerAccess") //Accessed by android library
+public class MovieListViewModel extends AndroidViewModel {
 
     //page numbers for the correct pagination
     private int currentPage = 0;
