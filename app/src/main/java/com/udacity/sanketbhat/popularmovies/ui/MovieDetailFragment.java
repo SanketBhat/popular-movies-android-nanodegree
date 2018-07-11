@@ -145,6 +145,7 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
             viewModel.getVideoResponse(movie.getId()).observe(this, videoResponse -> {
                 videoListAdapter.setContentList(videoResponse == null ? null : videoResponse.getVideos());
                 if (videoResponse != null) movie.setVideoResponse(videoResponse);
+                setupShareButton();
             });
 
             mBinding.cardViewShowMore.setOnClickListener(v -> {
