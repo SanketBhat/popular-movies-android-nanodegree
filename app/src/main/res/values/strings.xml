@@ -43,7 +43,7 @@
     <string name="movie_list_error_layout_retry_button_label">Retry</string>
     <string name="movie_grid_item_loading_indicator_text">Loading more movies…</string>
     <string name="shared_element_transition_name">poster_image</string>
-    <string name="video_clicked_no_app_error">No application installed to open the video</string>
+    <string name="item_clicked_no_app_error">No application installed to open the item</string>
     <string name="title_popular_movie">Popular Movies</string>
     <string name="title_top_rated_movie">Top Rated Movies</string>
     <string name="menu_main_action_favorites">Favorites</string>
@@ -60,5 +60,6 @@
     Picasso \n http://square.github.io/picasso/</string>
     <string name="menu_share">Share</string>
     <string name="share_text_template">Here is an awesome movie I found, watch the trailer %s .Explore popular movies list using app \'Pop Moviez\' :)</string>
+    <string name="movie_detail_show_more"><![CDATA[Show More>]]></string>
 
 </resources>

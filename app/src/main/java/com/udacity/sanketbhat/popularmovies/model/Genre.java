@@ -19,6 +19,8 @@ package com.udacity.sanketbhat.popularmovies.model;
 import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("unused")//Some methods are used by retrofit API
+//Now its using the static genre names because its not frequently changing
+// can also download it dynamically
 public class Genre {
 
     @SerializedName("id")

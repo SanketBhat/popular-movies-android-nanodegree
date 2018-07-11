@@ -218,6 +218,7 @@ public class Movie implements Parcelable {
         return videoResponse.getVideos();
     }
 
+    @SuppressWarnings("unused") //normal getter
     public List<Review> getReviews() {
         if (reviewResponse == null) return null;
         return reviewResponse.getReviews();

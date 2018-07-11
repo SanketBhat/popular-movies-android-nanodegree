@@ -24,6 +24,8 @@ import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
 import com.udacity.sanketbhat.popularmovies.database.MovieDao;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
 import com.udacity.sanketbhat.popularmovies.model.PageResponse;
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -48,6 +50,7 @@ public class MovieRepository {
         service = Dependencies.getTheMovieDBApiService();
     }
 
+    //Singleton
     public static MovieRepository getInstance(Context context) {
         if (movieRepository == null) {
             synchronized (LOCK) {
@@ -81,44 +84,75 @@ public class MovieRepository {
         executor.execute(() -> movieDao.insert(movie));
     }
 
-    public void getMovie(int id, ResponseCallback callback) {
+    public void getReviews(int id, ReviewResponseCallback callback) {
         executor.execute(() -> {
             Movie movieFromDatabase = movieDao.getMovie(id);
-            if (movieFromDatabase == null) loadFromInternet(id, false, callback);
-            else if (movieFromDatabase.getReviewResponse() == null || movieFromDatabase.getVideoResponse() == null)
-                loadFromInternet(id, true, callback);
-            else callback.onResponse(movieFromDatabase);
+            if (movieFromDatabase == null)
+                loadReviewsFromInternet(id, false, callback);
+            else if (movieFromDatabase.getReviewResponse() == null)
+                loadReviewsFromInternet(id, true, callback);
+            else callback.onReviewResponse(movieFromDatabase.getReviewResponse());
         });
     }
 
-    private void loadFromInternet(int id, boolean isFavorite, ResponseCallback callback) {
-        service.getMovie(id).enqueue(new Callback<Movie>() {
+    public void getVideos(int id, VideoResponseCallback callback) {
+        executor.execute(() -> {
+            Movie movieFromDatabase = movieDao.getMovie(id);
+            if (movieFromDatabase == null)
+                loadVideoFromInternet(id, false, callback);
+            else if (movieFromDatabase.getVideoResponse() == null)
+                loadVideoFromInternet(id, true, callback);
+            else callback.onVideoResponse(movieFromDatabase.getVideoResponse());
+        });
+    }
+
+    private void loadVideoFromInternet(int id, boolean isFavorite, VideoResponseCallback callback) {
+        service.getVideos(id).enqueue(new Callback<VideoResponse>() {
+
             @Override
-            public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Movie movieResult = response.body();
-                    callback.onResponse(movieResult);
-                    if (isFavorite && movieResult != null
-                            && movieResult.getVideoResponse() != null
-                            && movieResult.getReviewResponse() != null) {
-                        executor.execute(() -> {
-                            movieDao.updateVideos(id, movieResult.getVideoResponse());
-                            movieDao.updateReviews(id, movieResult.getReviewResponse());
-                        });
+            public void onResponse(@NonNull Call<VideoResponse> call, @NonNull Response<VideoResponse> response) {
+                if (response.isSuccessful()) {
+                    VideoResponse videoResponse = response.body();
+                    callback.onVideoResponse(videoResponse);
+                    if (isFavorite && videoResponse != null) {
+                        executor.execute(() -> movieDao.updateVideos(id, videoResponse));
                     }
-                } else {
-                    callback.onResponse(null);
-                }
+                } else callback.onVideoResponse(null);
             }
 
             @Override
-            public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
-                callback.onResponse(null);
+            public void onFailure(@NonNull Call<VideoResponse> call, @NonNull Throwable t) {
+                callback.onVideoResponse(null);
+            }
+        });
+
+    }
+
+    private void loadReviewsFromInternet(int id, boolean isFavorite, ReviewResponseCallback callback) {
+        service.getReviews(id).enqueue(new Callback<ReviewResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ReviewResponse> call, @NonNull Response<ReviewResponse> response) {
+                if (response.isSuccessful()) {
+                    ReviewResponse reviewResponse = response.body();
+                    callback.onReviewResponse(reviewResponse);
+                    if (isFavorite && reviewResponse != null) {
+                        executor.execute(() -> movieDao.updateReviews(id, reviewResponse));
+                    }
+                } else callback.onReviewResponse(null);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ReviewResponse> call, @NonNull Throwable t) {
+                callback.onReviewResponse(null);
             }
         });
     }
 
-    public interface ResponseCallback {
-        void onResponse(Movie movie);
+    public interface ReviewResponseCallback {
+        void onReviewResponse(ReviewResponse reviewResponse);
+    }
+
+    public interface VideoResponseCallback {
+        void onVideoResponse(VideoResponse videoResponse);
     }
 }

@@ -29,6 +29,9 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Gives the singletons of required classes.
+ */
 class Dependencies {
 
     //Connection timeouts for network calls

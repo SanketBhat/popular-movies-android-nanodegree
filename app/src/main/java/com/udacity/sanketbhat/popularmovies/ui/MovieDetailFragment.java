@@ -60,6 +60,7 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
 
     public static final String ARG_ITEM = "movieItem";
     private static final String YOUTUBE_LINK_TEMPLATE = "https://www.youtube.com/watch?v=";
+    private static final String THE_MOVIE_DB_WEB_TEMPLATE = "https://www.themoviedb.org/movie/";
     private Movie movie;
     private MovieDetailViewModel viewModel;
     private boolean isFavorite;
@@ -136,15 +137,25 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
                 else mBinding.buttonFavorites.setImageResource(R.drawable.ic_favorite_border_white);
             });
 
-            viewModel.getMovie(movie.getId()).observe(this, movie -> {
-                videoListAdapter.setContentList(movie == null ? null : movie.getVideos());
-                reviewListAdapter.setContentList(movie == null ? null : movie.getReviews());
-                if (movie != null && movie.getReviewResponse() != null && movie.getVideoResponse() != null) {
-                    this.movie.setVideoResponse(movie.getVideoResponse());
-                    this.movie.setReviewResponse(movie.getReviewResponse());
-                    setupShareButton();
+            viewModel.getReviewResponse(movie.getId()).observe(this, reviewResponse -> {
+                reviewListAdapter.setContentList(reviewResponse == null ? null : reviewResponse.getReviews());
+                if (reviewResponse != null) movie.setReviewResponse(reviewResponse);
+            });
+
+            viewModel.getVideoResponse(movie.getId()).observe(this, videoResponse -> {
+                videoListAdapter.setContentList(videoResponse == null ? null : videoResponse.getVideos());
+                if (videoResponse != null) movie.setVideoResponse(videoResponse);
+            });
+
+            mBinding.cardViewShowMore.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(THE_MOVIE_DB_WEB_TEMPLATE + movie.getId()));
+                if (getContext().getPackageManager().resolveActivity(intent, 0) != null) {
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.item_clicked_no_app_error), Toast.LENGTH_SHORT).show();
                 }
             });
+
         } else Log.i(this.getClass().getSimpleName(), "Can't bind data. movie/context is null!");
 
         return rootView;
@@ -192,6 +203,6 @@ public class MovieDetailFragment extends Fragment implements VideoClickListener 
             startActivity(intent);
             return;
         }
-        Toast.makeText(getContext(), R.string.video_clicked_no_app_error, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.item_clicked_no_app_error, Toast.LENGTH_SHORT).show();
     }
 }

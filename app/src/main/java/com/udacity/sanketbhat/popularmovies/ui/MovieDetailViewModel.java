@@ -23,15 +23,21 @@ import android.arch.lifecycle.MutableLiveData;
 
 import com.udacity.sanketbhat.popularmovies.MovieRepository;
 import com.udacity.sanketbhat.popularmovies.model.Movie;
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
 
 @SuppressWarnings("WeakerAccess") //Accessed by android library
 public class MovieDetailViewModel extends AndroidViewModel {
-    private final MutableLiveData<Movie> movie;
+    private final MutableLiveData<ReviewResponse> reviewResponseLiveData;
+    private final MutableLiveData<VideoResponse> videoResponseLiveData;
+    //cached id for retrieving review, videos after configuration changes ex: rotation
+    private int currentId;
     private final MovieRepository repo;
 
     public MovieDetailViewModel(Application application) {
         super(application);
-        movie = new MutableLiveData<>();
+        reviewResponseLiveData = new MutableLiveData<>();
+        videoResponseLiveData = new MutableLiveData<>();
         repo = MovieRepository.getInstance(application.getApplicationContext());
     }
 
@@ -39,13 +45,24 @@ public class MovieDetailViewModel extends AndroidViewModel {
         return repo.isFavorite(id);
     }
 
-    public MutableLiveData<Movie> getMovie(int id) {
-        if (movie.getValue() != null
-                && movie.getValue().getId() == id
-                && movie.getValue().getVideoResponse() != null
-                && movie.getValue().getReviewResponse() != null) return movie;
-        repo.getMovie(id, movie::postValue);
-        return movie;
+    public MutableLiveData<ReviewResponse> getReviewResponse(int id) {
+        if (id == currentId && reviewResponseLiveData.getValue() != null) {
+            //If cached value exist return
+            return reviewResponseLiveData;
+        }
+        currentId = id;
+        repo.getReviews(id, reviewResponseLiveData::postValue);
+        return reviewResponseLiveData;
+    }
+
+    public MutableLiveData<VideoResponse> getVideoResponse(int id) {
+        if (id == currentId && videoResponseLiveData.getValue() != null) {
+            //If cached, return
+            return videoResponseLiveData;
+        }
+        currentId = id;
+        repo.getVideos(id, videoResponseLiveData::postValue);
+        return videoResponseLiveData;
     }
 
     public void insertIntoFavorites(Movie movie) {

@@ -38,8 +38,8 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleMarginEnd="64dp"
-                app:expandedTitleMarginStart="64dp"
+                app:expandedTitleMarginEnd="@dimen/movie_detail_landscape_title_margin"
+                app:expandedTitleMarginStart="@dimen/movie_detail_landscape_title_margin"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:toolbarId="@+id/toolbar">
 
@@ -79,9 +79,9 @@
             android:id="@+id/movieDetailContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="28dp"
-            android:layout_marginStart="28dp"
-            app:behavior_overlapTop="64dp"
+            android:layout_marginEnd="@dimen/movie_detail_margin_content"
+            android:layout_marginStart="@dimen/movie_detail_margin_content"
+            app:behavior_overlapTop="@dimen/movie_detail_landscape_overlap"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         </android.support.v4.widget.NestedScrollView>

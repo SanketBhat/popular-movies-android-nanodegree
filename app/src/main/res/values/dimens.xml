@@ -40,6 +40,9 @@
     <dimen name="movie_detail_card_view_margin">4dp</dimen>
     <dimen name="movie_detail_movie_poster_width">150dp</dimen>
     <dimen name="movie_detail_movie_poster_height">225dp</dimen>
+    <dimen name="movie_detail_landscape_title_margin">64dp</dimen>
+    <dimen name="movie_detail_landscape_overlap">64dp</dimen>
+    <dimen name="movie_detail_margin_content">28dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="video_item_height">160dp</dimen>
     <dimen name="video_item_width">240dp</dimen>
