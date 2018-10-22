@@ -20,6 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
+    card_view:cardCornerRadius="@dimen/movie_list_grid_item_card_view_corner_radius"
     android:layout_margin="@dimen/movie_list_grid_item_card_view_margin"
     card_view:cardElevation="@dimen/movie_list_grid_item_card_view_elevation">
 
@@ -27,7 +28,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/movie_list_grid_item_layout_margin"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
@@ -47,8 +47,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:paddingEnd="@dimen/movie_list_grid_item_text_padding"
             android:paddingStart="@dimen/movie_list_grid_item_text_padding"
+            android:paddingEnd="@dimen/movie_list_grid_item_text_padding"
             android:textAppearance="?attr/textAppearanceListItem"
             tools:text="Deadpool 2" />
 
@@ -58,8 +58,9 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:paddingEnd="@dimen/movie_list_grid_item_text_padding"
             android:paddingStart="@dimen/movie_list_grid_item_text_padding"
+            android:paddingEnd="@dimen/movie_list_grid_item_text_padding"
+            android:paddingBottom="@dimen/movie_list_grid_item_text_padding_bottom"
             tools:text="Action, Comedy" />
     </LinearLayout>
 </android.support.v7.widget.CardView>
