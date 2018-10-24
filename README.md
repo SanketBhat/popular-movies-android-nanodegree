@@ -2,12 +2,9 @@
 This is second project in the Android Developer Nanodegree, Udacity. I created it from scratch.
 
 ## Screenshots
-<img src=".art/screenshot1.webp" width="50%"/>
+<img src=".art/gp_screenshot.webp" width="100%"/>
+<img src=".art/screenshot1.webp" width="100%"/>
 <img src=".art/screenshot2.webp" width="50%"/>
-<img src=".art/screenshot3.webp" width="50%"/>
-<img src=".art/screenshot4.webp" width="75%"/>
-<img src=".art/screenshot5.webp" width="75%"/>
-<img src=".art/screenshot6.webp" width="100%"/>
 
 ## Features
 - Sort movies based on popularity or top rated
