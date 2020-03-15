@@ -17,3 +17,14 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Upload lint results
+      uses: actions/upload-artifact@v1
+      with:
+        name: Lint Results.html
+        path: build/reports/lint-results.html
+    - name: Upload apk
+      uses: actions/upload-artifact@v1
+      if: success()
+      with:
+        name: Pop-Moviez-${{github.ref}}.apk
+        path: build/outputs/apk/app-release.apk
