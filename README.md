@@ -1,4 +1,5 @@
 # Popular Movies
+![Android Build](https://github.com/SanketBhat/popular-movies-android-nanodegree/workflows/Android%20Build/badge.svg)<br>
 This is second project in the Android Developer Nanodegree, Udacity. I created it from scratch.
 
 ## Screenshots
