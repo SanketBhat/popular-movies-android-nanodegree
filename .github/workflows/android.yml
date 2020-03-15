@@ -22,9 +22,5 @@ jobs:
       with:
         name: Lint Results.html
         path: app/build/reports/lint-results.html
-    - name: Upload apk
-      uses: actions/upload-artifact@v1
-      if: success()
-      with:
-        name: Pop-Moviez-${{github.run_id}}.apk
-        path: app/build/outputs/apk/release/app-release.apk
+    - name: Check existance
+      run: cat || ls app/build/outputs/apk/release
