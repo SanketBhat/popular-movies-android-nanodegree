@@ -27,4 +27,4 @@ jobs:
       if: success()
       with:
         name: Pop-Moviez-${{github.run_id}}.apk
-        path: app/build/outputs/apk/app-release.apk
+        path: app/build/outputs/apk/release/app-release.apk
