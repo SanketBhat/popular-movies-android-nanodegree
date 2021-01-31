@@ -1,11 +1,12 @@
 # Popular Movies
 ![Android Build](https://github.com/SanketBhat/popular-movies-android-nanodegree/workflows/Android%20Build/badge.svg)<br>
-This is second project in the Android Developer Nanodegree, Udacity. I created it from scratch.
+It was the second project in the Android Developer Nanodegree, Udacity. I created it from scratch during the course. To try out the app download the it from [release
+page](https://github.com/SanketBhat/popular-movies-android-nanodegree/releases).
 
-## Screenshots
+I have edited it as recommended way to develop android apps kept changing, checkout commit `96ef37459369ef4295f561f6cfdb3d79c580e98f` to see how it was when I submitted it and checkout branch [legacy(java)](https://github.com/SanketBhat/popular-movies-android-nanodegree/tree/legacy(java)) to see earlier implementation using java.
+
+## Screenshot
 <img src=".art/gp_screenshot.webp" width="100%"/>
-<img src=".art/screenshot1.webp" width="100%"/>
-<img src=".art/screenshot2.webp" width="50%"/>
 
 ## Features
 - Sort movies based on popularity or top rated
