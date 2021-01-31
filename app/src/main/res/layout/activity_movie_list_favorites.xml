@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         tools:context=".ui.MovieListFavoritesFragment">
 
-        <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+        <androidx.recyclerview.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/favoritesMovieList"
             android:name="com.udacity.sanketbhat.popularmovies.MovieListFavoritesFragment"
             android:layout_width="match_parent"

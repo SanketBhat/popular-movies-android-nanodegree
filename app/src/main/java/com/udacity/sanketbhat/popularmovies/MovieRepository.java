@@ -16,9 +16,9 @@
 
 package com.udacity.sanketbhat.popularmovies;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
 import com.udacity.sanketbhat.popularmovies.database.MovieDao;

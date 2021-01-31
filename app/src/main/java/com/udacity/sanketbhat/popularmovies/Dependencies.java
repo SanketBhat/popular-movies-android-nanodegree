@@ -16,7 +16,7 @@
 
 package com.udacity.sanketbhat.popularmovies;
 
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
 
 import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService;
@@ -41,6 +41,7 @@ class Dependencies {
     private static MovieDao movieDao = null;
     private static final String DATABASE_NAME = "movies.db";
 
+    private Dependencies(){}
     //Build retrofit library components and obtain service object
     public static synchronized TheMovieDBApiService getTheMovieDBApiService() {
         if (theMovieDBApiService == null) {
@@ -51,7 +52,7 @@ class Dependencies {
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
                     .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl("http://api.themoviedb.org/3/movie/")
+                    .baseUrl("https://api.themoviedb.org/3/movie/")
                     .client(okHttpClient)
                     .build();
             theMovieDBApiService = retrofit.create(TheMovieDBApiService.class);

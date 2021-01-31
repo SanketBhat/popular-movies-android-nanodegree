@@ -22,7 +22,7 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+        <androidx.recyclerview.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/movie_list"
             android:name="com.udacity.sanketbhat.popularmovies.MovieListFragment"
             android:layout_width="match_parent"
