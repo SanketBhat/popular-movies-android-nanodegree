@@ -13,209 +13,160 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.palette.graphics.Palette
+import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Picasso.LoadedFrom
+import com.squareup.picasso.Target
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.ui.MovieListActivity
+import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.palette.graphics.Palette;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.ui.MovieListActivity;
-import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
-
-import java.util.List;
-
-public class MovieListAdapter extends RecyclerView.Adapter {
-
-    //Two view types
-    // -> 1. For normal movie grid item.
-    // -> 2. For the loading indicator at the end.
-    public static final int VIEW_TYPE_MOVIE = 1;
-    public static final int VIEW_TYPE_PROGRESS = 2;
-
-    private final MovieClickListener clickListener;
-    private final Context mContext;
-    private List<Movie> movies;
-
+class MovieListAdapter(private val mContext: Context, private var movies: List<Movie>?, private val clickListener: MovieClickListener?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     //Boolean flag for showing or not showing the loading indicator at the end of the grid.
-    private boolean loading = false;
-
-    public MovieListAdapter(Context context, List<Movie> movies, MovieClickListener clickListener) {
-        this.movies = movies;
-        this.clickListener = clickListener;
-        mContext = context;
-    }
-
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_MOVIE:
-                View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_grid_item, parent, false);
-                return new ViewHolder(inflatedView);
-
-            case VIEW_TYPE_PROGRESS:
-                View progressView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_loading_indicator, parent, false);
-                return new ProgressViewHolder(progressView);
-
-            default:
-                throw new IllegalArgumentException("Unsupported View type");
+    private var loading = false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_MOVIE -> {
+                val inflatedView = LayoutInflater.from(parent.context).inflate(R.layout.movie_grid_item, parent, false)
+                ViewHolder(inflatedView)
+            }
+            VIEW_TYPE_PROGRESS -> {
+                val progressView = LayoutInflater.from(parent.context).inflate(R.layout.grid_loading_indicator, parent, false)
+                ProgressViewHolder(progressView)
+            }
+            else -> throw IllegalArgumentException("Unsupported View type")
         }
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        switch (getItemViewType(position)) {
-            case VIEW_TYPE_MOVIE:
-                if (holder instanceof ViewHolder) {
-                    //Bind view with data
-                    final ViewHolder viewHolder = (ViewHolder) holder;
-                    final Movie movie = movies.get(position);
-                    viewHolder.movieGenre.setText(movie.getGenresString());
-                    viewHolder.movieName.setText(movie.getTitle());
-                    Picasso.with(mContext)
-                            .load(ImageUrlBuilder.getPosterUrlString(movie.getPosterPath()))
-                            .tag(MovieListActivity.class.getSimpleName())
-                            .error(R.drawable.ic_movie_grid_item_image_error)
-                            .placeholder(R.drawable.ic_loading_indicator)
-                            .into(viewHolder.target);
-                }
-                break;
-
-            case VIEW_TYPE_PROGRESS:
-                //progress is showing
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unsupported View type");
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (getItemViewType(position)) {
+            VIEW_TYPE_MOVIE -> if (holder is ViewHolder) {
+                //Bind view with data
+                val viewHolder = holder
+                val movie = movies!![position]
+                viewHolder.movieGenre.text = movie.genresString
+                viewHolder.movieName.text = movie.title
+                Picasso.with(mContext)
+                        .load(ImageUrlBuilder.getPosterUrlString(movie.posterPath))
+                        .tag(MovieListActivity::class.java.simpleName)
+                        .error(R.drawable.ic_movie_grid_item_image_error)
+                        .placeholder(R.drawable.ic_loading_indicator)
+                        .into(viewHolder.target)
+            }
+            VIEW_TYPE_PROGRESS -> {
+            }
+            else -> throw IllegalArgumentException("Unsupported View type")
         }
     }
 
-    @Override
-    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         //Cleanup resources after viewHolder recycled
-        if (holder instanceof ViewHolder) ((ViewHolder) holder).cleanUp();
+        if (holder is ViewHolder) holder.cleanUp()
     }
 
-    @Override
-    public int getItemCount() {
+    override fun getItemCount(): Int {
         //If movies = null return 0, or if next page is loading return size of movies + 1
         //Else its normal, return movies.size()
-        if (movies == null) return 0;
-        else if (loading) return movies.size() + 1;
-        else return movies.size();
+        return if (movies == null) 0 else if (loading) movies!!.size + 1 else movies!!.size
     }
 
-    @Override
-    public int getItemViewType(int position) {
+    override fun getItemViewType(position: Int): Int {
         //If loading new page, return last element type as loading indicator
-        if ((position == movies.size()) && isLoading()) return VIEW_TYPE_PROGRESS;
-        else return VIEW_TYPE_MOVIE;
+        return if (position == movies!!.size && isLoading()) VIEW_TYPE_PROGRESS else VIEW_TYPE_MOVIE
     }
 
-    public boolean isLoading() {
-        return loading;
+    fun isLoading(): Boolean {
+        return loading
     }
 
-    public void setLoading(boolean loading) {
+    fun setLoading(loading: Boolean) {
         if (this.loading != loading) {
             //If loading is finished due to error or successful response-
             //notify the list to hide the loading indicator
-            this.loading = loading;
-            notifyDataSetChanged();
+            this.loading = loading
+            notifyDataSetChanged()
         }
     }
 
     //Swap the new available list with the current one
-    public void swapMovies(List<Movie> movies) {
-        this.movies = movies;
-        notifyDataSetChanged();
+    fun swapMovies(movies: List<Movie>?) {
+        this.movies = movies
+        notifyDataSetChanged()
     }
 
     //ViewHolder for normal movie item.
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        final ImageView moviePoster;
-        final TextView movieName;
-        final TextView movieGenre;
-        final CardView rootView;
-        private int cardBackground = 0;
+    internal inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        val rootView: CardView = itemView as CardView
+        val moviePoster: ImageView = itemView.findViewById(R.id.movie_grid_item_image)
+        val movieName: TextView = itemView.findViewById(R.id.movie_grid_item_title)
+        val movieGenre: TextView = itemView.findViewById(R.id.movie_grid_item_genre)
 
-        final Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        private var cardBackground = 0
+        val target: Target = object : Target {
+            override fun onBitmapLoaded(bitmap: Bitmap, from: LoadedFrom) {
                 try {
                     if (cardBackground == 0) {
-                        Palette.from(bitmap).generate(palette -> {
-                            Palette.Swatch swatch = palette.getVibrantSwatch();
+                        Palette.from(bitmap).generate { palette: Palette? ->
+                            val swatch = palette!!.vibrantSwatch
                             if (swatch != null) {
-                                rootView.setCardBackgroundColor((cardBackground = swatch.getRgb()));
-                                movieName.setTextColor(swatch.getBodyTextColor());
-                                movieGenre.setTextColor(swatch.getTitleTextColor());
+                                rootView.setCardBackgroundColor(swatch.rgb.also { cardBackground = it })
+                                movieName.setTextColor(swatch.bodyTextColor)
+                                movieGenre.setTextColor(swatch.titleTextColor)
                             }
-                        });
-
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(mContext, "Error loading cardView background color", Toast.LENGTH_SHORT).show();
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "Error loading cardView background color", Toast.LENGTH_SHORT).show()
                 }
-                moviePoster.setImageBitmap(bitmap);
+                moviePoster.setImageBitmap(bitmap)
             }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                moviePoster.setImageDrawable(errorDrawable);
+            override fun onBitmapFailed(errorDrawable: Drawable) {
+                moviePoster.setImageDrawable(errorDrawable)
             }
 
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            rootView = (CardView) itemView;
-            itemView.setOnClickListener(this);
-            moviePoster = itemView.findViewById(R.id.movie_grid_item_image);
-            movieName = itemView.findViewById(R.id.movie_grid_item_title);
-            movieGenre = itemView.findViewById(R.id.movie_grid_item_genre);
+            override fun onPrepareLoad(placeHolderDrawable: Drawable) {}
         }
 
-        @Override
-        public void onClick(View v) {
-            if (clickListener != null) {
-                clickListener.onClickItem(v, movies.get(getAdapterPosition()));
-            }
+        override fun onClick(v: View) {
+            clickListener?.onClickItem(v, movies!![adapterPosition])
         }
 
-        private void cleanUp() {
+        fun cleanUp() {
             //Cancel request once viewHolder recycled.
-            Picasso.with(moviePoster.getContext())
-                    .cancelRequest(moviePoster);
-            moviePoster.setImageDrawable(null);
-            cardBackground = 0;
+            Picasso.with(moviePoster.context)
+                    .cancelRequest(moviePoster)
+            moviePoster.setImageDrawable(null)
+            cardBackground = 0
         }
     }
 
     //View Holder for progress indicator
-    class ProgressViewHolder extends RecyclerView.ViewHolder {
-        ProgressViewHolder(View itemView) {
-            super(itemView);
-        }
+    internal inner class ProgressViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)
+    companion object {
+        //Two view types
+        // -> 1. For normal movie grid item.
+        // -> 2. For the loading indicator at the end.
+        const val VIEW_TYPE_MOVIE = 1
+        const val VIEW_TYPE_PROGRESS = 2
     }
 }

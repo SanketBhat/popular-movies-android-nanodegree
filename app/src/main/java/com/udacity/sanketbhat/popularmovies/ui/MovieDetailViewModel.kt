@@ -13,63 +13,66 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.ui
 
-package com.udacity.sanketbhat.popularmovies.ui;
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.udacity.sanketbhat.popularmovies.MovieRepository
+import com.udacity.sanketbhat.popularmovies.MovieRepository.Companion.getInstance
+import com.udacity.sanketbhat.popularmovies.MovieRepository.ReviewResponseCallback
+import com.udacity.sanketbhat.popularmovies.MovieRepository.VideoResponseCallback
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse
 
-import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+//Accessed by android library
+class MovieDetailViewModel(application: Application) : AndroidViewModel(application) {
+    private val reviewResponseLiveData: MutableLiveData<ReviewResponse?> = MutableLiveData()
+    private val videoResponseLiveData: MutableLiveData<VideoResponse?> = MutableLiveData()
 
-import com.udacity.sanketbhat.popularmovies.MovieRepository;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
-import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
-
-@SuppressWarnings("WeakerAccess") //Accessed by android library
-public class MovieDetailViewModel extends AndroidViewModel {
-    private final MutableLiveData<ReviewResponse> reviewResponseLiveData;
-    private final MutableLiveData<VideoResponse> videoResponseLiveData;
     //cached id for retrieving review, videos after configuration changes ex: rotation
-    private int currentId;
-    private final MovieRepository repo;
-
-    public MovieDetailViewModel(Application application) {
-        super(application);
-        reviewResponseLiveData = new MutableLiveData<>();
-        videoResponseLiveData = new MutableLiveData<>();
-        repo = MovieRepository.getInstance(application.getApplicationContext());
+    private var currentId = 0
+    private val repo: MovieRepository? = getInstance(application.applicationContext)
+    fun isFavorite(id: Int): LiveData<Movie> {
+        return repo!!.isFavorite(id)
     }
 
-    public LiveData<Movie> isFavorite(int id) {
-        return repo.isFavorite(id);
-    }
-
-    public MutableLiveData<ReviewResponse> getReviewResponse(int id) {
-        if (id == currentId && reviewResponseLiveData.getValue() != null) {
+    fun getReviewResponse(id: Int): MutableLiveData<ReviewResponse?> {
+        if (id == currentId && reviewResponseLiveData.value != null) {
             //If cached value exist return
-            return reviewResponseLiveData;
+            return reviewResponseLiveData
         }
-        currentId = id;
-        repo.getReviews(id, reviewResponseLiveData::postValue);
-        return reviewResponseLiveData;
+        currentId = id
+        repo!!.getReviews(id, object : ReviewResponseCallback {
+            override fun onReviewResponse(reviewResponse: ReviewResponse?) {
+                reviewResponseLiveData.postValue(reviewResponse)
+            }
+        })
+        return reviewResponseLiveData
     }
 
-    public MutableLiveData<VideoResponse> getVideoResponse(int id) {
-        if (id == currentId && videoResponseLiveData.getValue() != null) {
+    fun getVideoResponse(id: Int): MutableLiveData<VideoResponse?> {
+        if (id == currentId && videoResponseLiveData.value != null) {
             //If cached, return
-            return videoResponseLiveData;
+            return videoResponseLiveData
         }
-        currentId = id;
-        repo.getVideos(id, videoResponseLiveData::postValue);
-        return videoResponseLiveData;
+        currentId = id
+        repo!!.getVideos(id, object : VideoResponseCallback {
+            override fun onVideoResponse(videoResponse: VideoResponse?) {
+                videoResponseLiveData.postValue(videoResponse)
+            }
+        })
+        return videoResponseLiveData
     }
 
-    public void insertIntoFavorites(Movie movie) {
-        repo.insertMovie(movie);
+    fun insertIntoFavorites(movie: Movie?) {
+        repo!!.insertMovie(movie)
     }
 
-    public void removeFromFavorites(Movie movie) {
-        repo.deleteMovie(movie);
+    fun removeFromFavorites(movie: Movie?) {
+        repo!!.deleteMovie(movie)
     }
+
 }

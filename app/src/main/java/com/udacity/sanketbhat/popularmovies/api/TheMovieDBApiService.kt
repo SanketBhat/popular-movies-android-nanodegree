@@ -13,31 +13,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.api
 
-package com.udacity.sanketbhat.popularmovies.api;
+import com.udacity.sanketbhat.popularmovies.BuildConfig
+import com.udacity.sanketbhat.popularmovies.model.PageResponse
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-import com.udacity.sanketbhat.popularmovies.BuildConfig;
-import com.udacity.sanketbhat.popularmovies.model.PageResponse;
-import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
-import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
+interface TheMovieDBApiService {
+    @GET("{type}?api_key=$API_KEY")
+    fun getFirstPage(@Path("type") sortOrderPath: String?): Call<PageResponse?>?
 
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+    @GET("{type}?api_key=$API_KEY")
+    fun getPage(@Path("type") sortOrderPath: String?, @Query("page") pageNumber: Int): Call<PageResponse?>?
 
-public interface TheMovieDBApiService {
-    String API_KEY = BuildConfig.THE_MOVIE_DB_API_KEY;
+    @GET("{id}/videos?api_key=$API_KEY")
+    fun getVideos(@Path("id") id: Int): Call<VideoResponse?>?
 
-    @GET("{type}?api_key=" + API_KEY)
-    Call<PageResponse> getFirstPage(@Path("type") String sortOrderPath);
+    @GET("{id}/reviews?api_key=$API_KEY")
+    fun getReviews(@Path("id") id: Int): Call<ReviewResponse?>?
 
-    @GET("{type}?api_key=" + API_KEY)
-    Call<PageResponse> getPage(@Path("type") String sortOrderPath, @Query("page") int pageNumber);
-
-    @GET("{id}/videos?api_key=" + API_KEY)
-    Call<VideoResponse> getVideos(@Path("id") int id);
-
-    @GET("{id}/reviews?api_key=" + API_KEY)
-    Call<ReviewResponse> getReviews(@Path("id") int id);
+    companion object {
+        const val API_KEY = BuildConfig.THE_MOVIE_DB_API_KEY
+    }
 }

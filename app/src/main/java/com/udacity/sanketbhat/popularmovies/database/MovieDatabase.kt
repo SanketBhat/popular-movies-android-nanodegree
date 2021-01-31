@@ -13,17 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.database
 
-package com.udacity.sanketbhat.popularmovies.database;
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.udacity.sanketbhat.popularmovies.model.Movie
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
-
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-
-@Database(entities = {Movie.class}, version = 1, exportSchema = false)
-@TypeConverters({MovieTypeConverter.class})
-public abstract class MovieDatabase extends RoomDatabase {
-    public abstract MovieDao getMovieDao();
+@Database(entities = [Movie::class], version = 1, exportSchema = false)
+@TypeConverters(MovieTypeConverter::class)
+abstract class MovieDatabase : RoomDatabase() {
+    abstract val movieDao: MovieDao?
 }

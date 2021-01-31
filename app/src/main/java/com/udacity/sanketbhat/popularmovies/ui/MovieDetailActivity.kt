@@ -13,59 +13,49 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.ui
 
-package com.udacity.sanketbhat.popularmovies.ui;
-
-import androidx.databinding.DataBindingUtil;
-import android.os.Build;
-import android.os.Bundle;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import android.view.MenuItem;
-
-import com.squareup.picasso.Picasso;
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieDetailBinding;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder;
+import android.os.Build
+import android.os.Bundle
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.squareup.picasso.Picasso
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieDetailBinding
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder.getBackdropUrlString
 
 /**
  * An activity representing a single Movie detail screen. This
  * activity is only used on narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link MovieListActivity}.
+ * in a [MovieListActivity].
  */
-public class MovieDetailActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_detail);
-        ActivityMovieDetailBinding mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
-        setSupportActionBar(mBinding.detailToolbar);
+class MovieDetailActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_movie_detail)
+        val mBinding: ActivityMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail)
+        setSupportActionBar(mBinding.detailToolbar)
 
         //Postpone transition until fragment inflated.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            postponeEnterTransition();
+            postponeEnterTransition()
         }
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         //Set name and image for collapsing toolbar layout
-        Movie movie = getIntent().getParcelableExtra(MovieDetailFragment.ARG_ITEM);
+        val movie: Movie? = intent.getParcelableExtra(MovieDetailFragment.ARG_ITEM)
         if (movie != null) {
             //Load backdrop image.
             Picasso.with(this)
-                    .load(ImageUrlBuilder.getBackdropUrlString(movie.getBackdropPath()))
-                    .into(mBinding.imageBackdrop);
-
-            if (mBinding.toolbarLayout != null) {
-                mBinding.toolbarLayout.setTitle(movie.getTitle());
-            }
+                    .load(getBackdropUrlString(movie.backdropPath))
+                    .into(mBinding.imageBackdrop)
+            mBinding.toolbarLayout.title = movie.title
         }
 
         // savedInstanceState is non-null when there is fragment state
@@ -80,24 +70,23 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
+            val arguments = Bundle()
             arguments.putParcelable(MovieDetailFragment.ARG_ITEM,
-                    getIntent().getParcelableExtra(MovieDetailFragment.ARG_ITEM));
-            MovieDetailFragment fragment = new MovieDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
+                    intent.getParcelableExtra(MovieDetailFragment.ARG_ITEM))
+            val fragment = MovieDetailFragment()
+            fragment.arguments = arguments
+            supportFragmentManager.beginTransaction()
                     .add(R.id.movieDetailContainer, fragment)
-                    .commit();
+                    .commit()
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
         if (id == android.R.id.home) {
-            supportFinishAfterTransition();
-            return true;
+            supportFinishAfterTransition()
+            return true
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 }

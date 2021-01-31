@@ -13,74 +13,57 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.ui
 
-package com.udacity.sanketbhat.popularmovies.ui;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
+import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager
+import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter
+import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFavoritesBinding
+import com.udacity.sanketbhat.popularmovies.model.Movie
 
-import androidx.lifecycle.ViewModelProviders;
-import androidx.databinding.DataBindingUtil;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener;
-import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager;
-import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter;
-import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFavoritesBinding;
-
-public class MovieListFavoritesFragment extends Fragment {
-
-    private MovieListViewModel viewModel;
-
-    public MovieListFavoritesFragment() {
-        // Required empty public constructor
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getActivity() != null)
-            viewModel = ViewModelProviders.of(getActivity()).get(MovieListViewModel.class);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        if (getActivity() != null) getActivity().setTitle("Favorites");
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.activity_movie_list_favorites, container, false);
-        ActivityMovieListFavoritesBinding mBinding = DataBindingUtil.bind(rootView);
-
-        if (mBinding != null) {
-            final MovieListAdapter adapter = new MovieListAdapter(getContext(), null, (MovieClickListener) getActivity());
-            MovieGridLayoutManager gridLayoutManager = new MovieGridLayoutManager(getContext(), adapter);
-            mBinding.favoritesMovieList.setLayoutManager(gridLayoutManager);
-            mBinding.favoritesMovieList.setAdapter(adapter);
-            viewModel.getFavorites().observe(this, movies -> {
-                adapter.swapMovies(movies);
-                if (movies != null && movies.size() > 0)
-                    mBinding.emptyFavoritesTextView.setVisibility(View.GONE);
-                else
-                    mBinding.emptyFavoritesTextView.setVisibility(View.VISIBLE);
-            });
+class MovieListFavoritesFragment : Fragment() {
+    private lateinit var viewModel: MovieListViewModel
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.let {
+            viewModel = ViewModelProvider(it).get(MovieListViewModel::class.java)
         }
-        return rootView;
+        setHasOptionsMenu(true)
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem item = menu.findItem(R.id.menu_action_favorites);
-        if (item != null) item.setVisible(false);
-        item = menu.findItem(R.id.menu_action_sort);
-        if (item != null) item.setVisible(false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        if (activity != null) activity!!.title = "Favorites"
+        // Inflate the layout for this fragment
+        val rootView = inflater.inflate(R.layout.activity_movie_list_favorites, container, false)
+        val mBinding: ActivityMovieListFavoritesBinding? = DataBindingUtil.bind(rootView)
+        if (mBinding != null) {
+            val adapter = MovieListAdapter(context!!, null, activity as MovieClickListener?)
+            val gridLayoutManager = MovieGridLayoutManager(context!!, adapter)
+            mBinding.favoritesMovieList.layoutManager = gridLayoutManager
+            mBinding.favoritesMovieList.adapter = adapter
+            viewModel.favorites?.observe(viewLifecycleOwner, { movies: List<Movie>? ->
+                adapter.swapMovies(movies)
+                if (movies != null && movies.isNotEmpty()) mBinding.emptyFavoritesTextView.visibility = View.GONE else mBinding.emptyFavoritesTextView.visibility = View.VISIBLE
+            })
+        }
+        return rootView
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        var item = menu.findItem(R.id.menu_action_favorites)
+        if (item != null) item.isVisible = false
+        item = menu.findItem(R.id.menu_action_sort)
+        if (item != null) item.isVisible = false
     }
 }

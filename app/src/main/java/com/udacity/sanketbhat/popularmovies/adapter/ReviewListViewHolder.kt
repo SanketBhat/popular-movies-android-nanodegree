@@ -13,22 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.widget.TextView;
-
-import com.udacity.sanketbhat.popularmovies.R;
-
-class ReviewListViewHolder extends RecyclerView.ViewHolder {
-    public final TextView review;
-    public final TextView author;
-
-    ReviewListViewHolder(View itemView) {
-        super(itemView);
-        review = itemView.findViewById(R.id.movieReviewText);
-        author = itemView.findViewById(R.id.movieReviewAuthor);
-    }
+class ReviewListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val review: TextView = itemView.findViewById(R.id.movieReviewText)
+    val author: TextView = itemView.findViewById(R.id.movieReviewAuthor)
 }

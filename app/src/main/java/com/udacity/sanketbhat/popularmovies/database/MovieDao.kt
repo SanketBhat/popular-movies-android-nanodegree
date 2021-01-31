@@ -13,42 +13,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.database
 
-package com.udacity.sanketbhat.popularmovies.database;
-
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
-import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse
 
 @Dao
-public interface MovieDao {
+interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Movie movie);
+    fun insert(movie: Movie?)
 
     @Delete
-    void delete(Movie movie);
+    fun delete(movie: Movie?)
 
     @Query("SELECT * FROM favorites WHERE id = :id")
-    LiveData<Movie> isFavorite(int id);
+    fun isFavorite(id: Int): LiveData<Movie>
 
     @Query("SELECT * FROM favorites WHERE id = :id")
-    Movie getMovie(int id);
+    fun getMovie(id: Int): Movie?
 
-    @Query("SELECT * FROM favorites ORDER BY title ASC")
-    LiveData<List<Movie>> getAllMovies();
+    @get:Query("SELECT * FROM favorites ORDER BY title ASC")
+    val allMovies: LiveData<List<Movie>>
 
     @Query("UPDATE favorites SET videoResponse = :videoResponse WHERE id = :id")
-    void updateVideos(int id, VideoResponse videoResponse);
+    fun updateVideos(id: Int, videoResponse: VideoResponse?)
 
     @Query("UPDATE favorites SET reviewResponse = :reviewResponse WHERE id = :id")
-    void updateReviews(int id, ReviewResponse reviewResponse);
+    fun updateReviews(id: Int, reviewResponse: ReviewResponse?)
 }

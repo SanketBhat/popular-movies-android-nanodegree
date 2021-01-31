@@ -13,180 +13,155 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.ui
 
-package com.udacity.sanketbhat.popularmovies.ui;
-
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-
-import com.squareup.picasso.Picasso;
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.model.SortOrder;
-import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils;
+import android.content.DialogInterface
+import android.content.Intent
+import android.os.Bundle
+import android.view.*
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import com.squareup.picasso.Picasso
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
+import com.udacity.sanketbhat.popularmovies.model.*
+import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
+import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.setPreferredSortOrder
 
 /**
  * An activity representing a list of Movies. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link MovieDetailActivity} representing
+ * lead to a [MovieDetailActivity] representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class MovieListActivity extends AppCompatActivity implements MovieClickListener, FragmentManager.OnBackStackChangedListener {
-
-    private boolean mTwoPane;
-    private Menu mOptionMenu;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_list);
+class MovieListActivity : AppCompatActivity(), MovieClickListener, FragmentManager.OnBackStackChangedListener {
+    private var mTwoPane = false
+    private var mOptionMenu: Menu? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_movie_list)
 
         //Prepare toolbar and set title
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-
-        if (findViewById(R.id.movie_detail_container) != null) {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        toolbar.title = title
+        if (findViewById<View?>(R.id.movie_detail_container) != null) {
             //the detail fragment shown only in the larger displays.
-            mTwoPane = true;
+            mTwoPane = true
         }
-
-        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        supportFragmentManager.addOnBackStackChangedListener(this)
         if (savedInstanceState == null) {
-            MovieListFragment fragment = new MovieListFragment();
-            getSupportFragmentManager().beginTransaction()
+            val fragment = MovieListFragment()
+            supportFragmentManager.beginTransaction()
                     .replace(R.id.movie_list_container, fragment)
-                    .commit();
+                    .commit()
         }
-        onBackStackChanged();
+        onBackStackChanged()
     }
 
-
-    @Override
-    protected void onStop() {
+    override fun onStop() {
         //Cancel all requests created within adapter.
         Picasso.with(this)
-                .cancelTag(MovieListActivity.class.getSimpleName());
-        super.onStop();
+                .cancelTag(MovieListActivity::class.java.simpleName)
+        super.onStop()
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        mOptionMenu = menu;
-        setupOptionMenu();
-        return true;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        mOptionMenu = menu
+        setupOptionMenu()
+        return true
     }
 
-    private void setupOptionMenu() {
-        int sortOrder = PreferenceUtils.getPreferredSortOrder(this);
-        switch (sortOrder) {
-            case SortOrder.SORT_ORDER_POPULAR:
-                mOptionMenu.findItem(R.id.menu_sort_popularity).setChecked(true);
-                break;
-
-            case SortOrder.SORT_ORDER_TOP_RATED:
-                mOptionMenu.findItem(R.id.menu_sort_rating).setChecked(true);
+    private fun setupOptionMenu() {
+        when (getPreferredSortOrder(this)) {
+            SortOrder.SORT_ORDER_POPULAR -> mOptionMenu!!.findItem(R.id.menu_sort_popularity).isChecked = true
+            SortOrder.SORT_ORDER_TOP_RATED -> mOptionMenu!!.findItem(R.id.menu_sort_rating).isChecked = true
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_sort_popularity:
-                item.setChecked(true);
-                return changeSortOrderTo(SortOrder.SORT_ORDER_POPULAR);
-
-            case R.id.menu_sort_rating:
-                item.setChecked(true);
-                return changeSortOrderTo(SortOrder.SORT_ORDER_TOP_RATED);
-
-            case R.id.menu_action_favorites:
-                MovieListFavoritesFragment movieListFavoritesFragment = new MovieListFavoritesFragment();
-                getSupportFragmentManager().beginTransaction()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_sort_popularity -> {
+                item.isChecked = true
+                return changeSortOrderTo(SortOrder.SORT_ORDER_POPULAR)
+            }
+            R.id.menu_sort_rating -> {
+                item.isChecked = true
+                return changeSortOrderTo(SortOrder.SORT_ORDER_TOP_RATED)
+            }
+            R.id.menu_action_favorites -> {
+                val movieListFavoritesFragment = MovieListFavoritesFragment()
+                supportFragmentManager.beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .replace(R.id.movie_list_container, movieListFavoritesFragment)
                         .addToBackStack(null)
-                        .commit();
-                break;
-
-            case R.id.menu_main_credits:
-                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .commit()
+            }
+            R.id.menu_main_credits -> {
+                val dialog = AlertDialog.Builder(this)
                         .setTitle(R.string.menu_main_credits)
                         .setMessage(R.string.credits_string)
-                        .setPositiveButton(R.string.credit_dialog_button, (dialog1, which) -> dialog1.dismiss()).create();
-                dialog.show();
-                break;
-
-            case android.R.id.home:
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-                    getSupportFragmentManager().popBackStack();
+                        .setPositiveButton(R.string.credit_dialog_button) { dialog1: DialogInterface, _: Int -> dialog1.dismiss() }.create()
+                dialog.show()
+            }
+            android.R.id.home -> if (supportFragmentManager.backStackEntryCount > 0) supportFragmentManager.popBackStack()
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
-    private boolean changeSortOrderTo(int sortOrder) {
-        if (PreferenceUtils.getPreferredSortOrder(this) != sortOrder) {
-            PreferenceUtils.setPreferredSortOrder(this, sortOrder);
-            return false;
+    private fun changeSortOrderTo(sortOrder: Int): Boolean {
+        return if (getPreferredSortOrder(this) != sortOrder) {
+            setPreferredSortOrder(this, sortOrder)
+            false
         } else {
-            return true;
+            true
         }
     }
 
-
-    @Override
-    public void onClickItem(View v, Movie movie) {
+    override fun onClickItem(v: View?, movie: Movie?) {
         //Pass the clicked movie item.
         //It will be removed in stage 2.
-        Bundle arguments = new Bundle();
-        arguments.putParcelable(MovieDetailFragment.ARG_ITEM, movie);
+        val arguments = Bundle()
+        arguments.putParcelable(MovieDetailFragment.ARG_ITEM, movie)
 
         //If twoPane layout just inflate/ replace the fragment at the right side.
         if (mTwoPane) {
-            MovieDetailFragment fragment = new MovieDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
+            val fragment = MovieDetailFragment()
+            fragment.arguments = arguments
+            supportFragmentManager.beginTransaction()
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .replace(R.id.movie_detail_container, fragment)
-                    .commit();
+                    .commit()
         } else {
             //Prepare items for shared element transactions
-            ImageView imageView = v.findViewById(R.id.movie_grid_item_image);
-            Bundle transition = ActivityOptionsCompat
+            val imageView = v!!.findViewById<ImageView>(R.id.movie_grid_item_image)
+            val transition = ActivityOptionsCompat
                     .makeSceneTransitionAnimation(this, imageView, getString(R.string.shared_element_transition_name))
-                    .toBundle();
+                    .toBundle()
 
             //If not twoPane layout start the MovieDetailActivity
-            Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtras(arguments);
-            startActivity(intent, transition);
+            val intent = Intent(this, MovieDetailActivity::class.java)
+            intent.putExtras(arguments)
+            startActivity(intent, transition)
         }
     }
 
-    @Override
-    public void onBackStackChanged() {
-        int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
-        ActionBar actionBar = getSupportActionBar();
+    override fun onBackStackChanged() {
+        val backStackEntryCount = supportFragmentManager.backStackEntryCount
+        val actionBar = supportActionBar
         if (actionBar != null) {
             if (backStackEntryCount <= 0) {
-                actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setDisplayHomeAsUpEnabled(false)
             } else {
-                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true)
             }
         }
     }

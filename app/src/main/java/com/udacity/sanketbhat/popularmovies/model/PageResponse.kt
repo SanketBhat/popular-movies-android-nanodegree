@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2018 Sanket Bhat
  *
@@ -14,60 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
-@SuppressWarnings("unused")//Some methods are used by retrofit API
-public class PageResponse {
-
+//Some methods are used by retrofit API
+class PageResponse {
     @SerializedName("page")
     @Expose
-    private Integer page;
+    var page: Int? = null
+
     @SerializedName("total_results")
     @Expose
-    private Integer totalResults;
+    var totalResults: Int? = null
+
     @SerializedName("total_pages")
     @Expose
-    private Integer totalPages;
+    var totalPages: Int? = null
+
     @SerializedName("results")
     @Expose
-    private List<Movie> movies = null;
-
-    public Integer getPage() {
-        return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
-    }
-
-    public Integer getTotalResults() {
-        return totalResults;
-    }
-
-    public void setTotalResults(Integer totalResults) {
-        this.totalResults = totalResults;
-    }
-
-    public Integer getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    public void setMovies(List<Movie> movies) {
-        this.movies = movies;
-    }
-
+    var movies: List<Movie>? = null
 }

@@ -13,146 +13,122 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.ui
 
-package com.udacity.sanketbhat.popularmovies.ui;
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.udacity.sanketbhat.popularmovies.MovieRepository
+import com.udacity.sanketbhat.popularmovies.MovieRepository.Companion.getInstance
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.model.PageResponse
+import com.udacity.sanketbhat.popularmovies.model.SortOrder.getSortOrderPath
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.annotation.NonNull;
-
-import com.udacity.sanketbhat.popularmovies.MovieRepository;
-import com.udacity.sanketbhat.popularmovies.model.Movie;
-import com.udacity.sanketbhat.popularmovies.model.PageResponse;
-import com.udacity.sanketbhat.popularmovies.model.SortOrder;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-@SuppressWarnings("WeakerAccess") //Accessed by android library
-public class MovieListViewModel extends AndroidViewModel {
-
+//Accessed by android library
+class MovieListViewModel(application: Application?) : AndroidViewModel(application!!) {
     //page numbers for the correct pagination
-    private int currentPage = 0;
-    private int totalPage = 0;
+    private var currentPage = 0
+    private var totalPage = 0
 
     //Observable items from the activity
-    private MutableLiveData<List<Movie>> movies;
-    private MutableLiveData<Void> failureIndicator;
-    private MutableLiveData<Boolean> loadingIndicator;
-    private LiveData<List<Movie>> favorites;
-
-    private int sortOrder;
-    private MovieRepository repo;
-
-
-    public MovieListViewModel(Application application) {
-        super(application);
-        initialize();
-    }
+    var movies: MutableLiveData<ArrayList<Movie>?>? = null
+        private set
+    var failureIndicator: MutableLiveData<Void?>? = null
+        private set
+    var loadingIndicator: MutableLiveData<Boolean?>? = null
+        private set
+    var favorites: LiveData<List<Movie>>? = null
+        private set
+    private var sortOrder = 0
+    private var repo: MovieRepository? = null
 
     //Initialize data/objects
-    private void initialize() {
-        repo = MovieRepository.getInstance(getApplication().getApplicationContext());
-        movies = new MutableLiveData<>();
-        failureIndicator = new MutableLiveData<>();
-        loadingIndicator = new MutableLiveData<>();
-        loadingIndicator.setValue(false);
-        favorites = repo.getFavorites();
+    private fun initialize() {
+        repo = getInstance(getApplication<Application>().applicationContext)
+        movies = MutableLiveData()
+        failureIndicator = MutableLiveData()
+        loadingIndicator = MutableLiveData()
+        loadingIndicator!!.value = false
+        favorites = repo!!.favorites
     }
 
     /**
      * Request for the first page of the list, called from MainListActivity
      *
      * @param sortOrder the sort order to list the movies, also used to distinguish between
-     *                  real calls and calls triggered by configuration changes
+     * real calls and calls triggered by configuration changes
      * @param retrying  this is flag determines whether it is retrying. If true it loads movie
-     *                  list even if it already exist
+     * list even if it already exist
      */
-    public void getFirstPage(int sortOrder, boolean retrying) {
+    fun getFirstPage(sortOrder: Int, retrying: Boolean) {
         //It implies it is called by configuration changes, just return.
-        if (this.sortOrder == sortOrder && !retrying) return;
+        if (this.sortOrder == sortOrder && !retrying) return
 
         //It is intentionally called, proceed with loading first page
-        this.sortOrder = sortOrder;
-        final Callback<PageResponse> pageCallback = new Callback<PageResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<PageResponse> call, @NonNull Response<PageResponse> response) {
-                if (response.isSuccessful()) {
-                    PageResponse pageResponse = response.body();
+        this.sortOrder = sortOrder
+        val pageCallback: Callback<PageResponse?> = object : Callback<PageResponse?> {
+            override fun onResponse(call: Call<PageResponse?>, response: Response<PageResponse?>) {
+                if (response.isSuccessful) {
+                    val pageResponse = response.body()
                     if (pageResponse != null) {
                         //If loading successful, update data and return
-                        currentPage = pageResponse.getPage();
-                        totalPage = pageResponse.getTotalPages();
-                        movies.setValue(pageResponse.getMovies());
-                        return;
+                        currentPage = pageResponse.page!!
+                        totalPage = pageResponse.totalPages!!
+                        movies!!.value = ArrayList(pageResponse.movies ?: emptyList())
+                        return
                     }
                 }
-                failureIndicator.setValue(null);
+                failureIndicator!!.value = null
             }
 
-            @Override
-            public void onFailure(@NonNull Call<PageResponse> call, @NonNull Throwable t) {
+            override fun onFailure(call: Call<PageResponse?>, t: Throwable) {
                 //If call failed trigger failureIndicator so that observing activity shows
                 //Error layout
-                failureIndicator.setValue(null);
+                failureIndicator!!.value = null
             }
-        };
-        repo.getFirstPage(SortOrder.getSortOrderPath(sortOrder), pageCallback);
+        }
+        repo!!.getFirstPage(getSortOrderPath(sortOrder), pageCallback)
     }
 
-    public void getNextPage() {
-        if (loadingIndicator.getValue() != null && loadingIndicator.getValue()) return;
+    //Next page loaded, append it to existing list
+    val nextPage: Unit
+        get() {
+            if (loadingIndicator!!.value != null && loadingIndicator!!.value!!) return
+            loadingIndicator!!.value = true
+            val pageCallback: Callback<PageResponse?> = object : Callback<PageResponse?> {
+                override fun onResponse(call: Call<PageResponse?>, response: Response<PageResponse?>) {
+                    loadingIndicator!!.value = false
+                    if (response.isSuccessful) {
+                        val pageResponse = response.body()
+                        if (pageResponse != null && movies!!.value != null) {
 
-        loadingIndicator.setValue(true);
-        final Callback<PageResponse> pageCallback = new Callback<PageResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<PageResponse> call, @NonNull Response<PageResponse> response) {
-                loadingIndicator.setValue(false);
-                if (response.isSuccessful()) {
-                    PageResponse pageResponse = response.body();
-                    if (pageResponse != null && movies.getValue() != null) {
-
-                        //Next page loaded, append it to existing list
-                        currentPage = pageResponse.getPage();
-                        totalPage = pageResponse.getTotalPages();
-                        movies.getValue().addAll(pageResponse.getMovies());
-                        return;
+                            //Next page loaded, append it to existing list
+                            currentPage = pageResponse.page!!
+                            totalPage = pageResponse.totalPages!!
+                            pageResponse.movies?.let {
+                                movies!!.value?.addAll(it)
+                            }
+                            return
+                        }
                     }
+                    failureIndicator!!.value = null
                 }
-                failureIndicator.setValue(null);
+
+                override fun onFailure(call: Call<PageResponse?>, t: Throwable) {
+                    loadingIndicator!!.value = false
+                    failureIndicator!!.value = null
+                }
             }
+            repo!!.getNextPage(getSortOrderPath(sortOrder), currentPage + 1, pageCallback)
+        }
+    val isLastPage: Boolean
+        get() = currentPage >= totalPage
 
-            @Override
-            public void onFailure(@NonNull Call<PageResponse> call, @NonNull Throwable t) {
-                loadingIndicator.setValue(false);
-                failureIndicator.setValue(null);
-            }
-        };
-        repo.getNextPage(SortOrder.getSortOrderPath(sortOrder), currentPage + 1, pageCallback);
-    }
-
-    public MutableLiveData<Void> getFailureIndicator() {
-        return failureIndicator;
-    }
-
-    public MutableLiveData<List<Movie>> getMovies() {
-        return movies;
-    }
-
-    public MutableLiveData<Boolean> getLoadingIndicator() {
-        return loadingIndicator;
-    }
-
-    public LiveData<List<Movie>> getFavorites() {
-        return favorites;
-    }
-
-    public boolean isLastPage() {
-        return currentPage >= totalPage;
+    init {
+        initialize()
     }
 }

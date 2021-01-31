@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2018 Sanket Bhat
  *
@@ -14,239 +13,146 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
-
-import android.annotation.SuppressLint;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.text.TextUtils;
-
-import com.google.gson.annotations.SerializedName;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import android.annotation.SuppressLint
+import android.os.Parcel
+import android.os.Parcelable
+import android.text.TextUtils
+import androidx.room.*
+import com.google.gson.annotations.SerializedName
+import java.text.SimpleDateFormat
 
 @Entity(tableName = "favorites")
-public class Movie implements Parcelable {
-
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
+class Movie : Parcelable {
     @PrimaryKey
     @SerializedName("id")
-    private int id;
+    var id = 0
+
     @SerializedName("title")
-    private String title;
+    var title: String? = null
+
     @SerializedName("vote_average")
-    private double voteAverage;
+    var voteAverage = 0.0
+
+    //Used by room library implicitly
     @SerializedName("release_date")
-    private String releaseDate;
+    var releaseDate: String? = null
+
     @SerializedName("genre_ids")
-    private int[] genreIds = null;
+    var genreIds: IntArray? = null
+
     @SerializedName("backdrop_path")
-    private String backdropPath;
+    var backdropPath: String? = null
+
     @SerializedName("overview")
-    private String overview;
+    var overview: String? = null
+
     @SerializedName("poster_path")
-    private String posterPath;
+    var posterPath: String? = null
+
     @SerializedName("adult")
-    private boolean adult;
+    var adult = false
+
     @SerializedName("videos")
-    private VideoResponse videoResponse;
+    var videoResponse: VideoResponse? = null
+
     @SerializedName("genres")
-    private List<Genre> genres;
+    var genres: List<Genre>? = null
+
     @SerializedName("reviews")
-    private ReviewResponse reviewResponse;
-    public Movie() {
+    var reviewResponse: ReviewResponse? = null
 
-    }
-
-    protected Movie(Parcel in) {
-        id = in.readInt();
-        title = in.readString();
-        voteAverage = in.readDouble();
-        releaseDate = in.readString();
-        genreIds = in.createIntArray();
-        backdropPath = in.readString();
-        overview = in.readString();
-        posterPath = in.readString();
-        adult = in.readByte() != 0;
-    }
-
-    public VideoResponse getVideoResponse() {
-        return videoResponse;
-    }
-
-    public void setVideoResponse(VideoResponse videoResponse) {
-        this.videoResponse = videoResponse;
-    }
-
-    public ReviewResponse getReviewResponse() {
-        return reviewResponse;
-    }
-
-    public void setReviewResponse(ReviewResponse reviewResponse) {
-        this.reviewResponse = reviewResponse;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Double getVoteAverage() {
-        return voteAverage;
-    }
-
-    public void setVoteAverage(Double voteAverage) {
-        this.voteAverage = voteAverage;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPosterPath() {
-        return posterPath;
-    }
-
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
-    }
-
-    public int[] getGenreIds() {
-        return genreIds;
-    }
-
-    public void setGenreIds(int[] genreIds) {
-        this.genreIds = genreIds;
-    }
+    constructor() {}
+    protected constructor(`in`: Parcel) {
+        id = `in`.readInt()
+        title = `in`.readString()
+        voteAverage = `in`.readDouble()
+        releaseDate = `in`.readString()
+        genreIds = `in`.createIntArray()
+        backdropPath = `in`.readString()
+        overview = `in`.readString()
+        posterPath = `in`.readString()
+        adult = `in`.readByte().toInt() != 0
+    }//If Genre list is not null, return its names
 
     /**
      * This method returns the string using the Genre object list. If it's null then
-     * it returns the string using the static data of the genre. {@link Genre}
+     * it returns the string using the static data of the genre. [Genre]
      *
      * @return returns the joined Genres of the movie separated by (,) or empty string.
      */
-    public String getGenresString() {
-        //If Genre list is not null, return its names
-        if (genres != null && genres.size() > 0) {
-            String strings[] = new String[genres.size()];
-            for (int i = 0; i < genres.size(); i++) {
-                strings[i] = genres.get(i).getGenreName();
+    val genresString: String
+        get() {
+            //If Genre list is not null, return its names
+            if (genres != null && genres!!.isNotEmpty()) {
+                val strings = arrayOfNulls<String>(genres!!.size)
+                for (i in genres!!.indices) {
+                    strings[i] = genres!![i].genreName
+                }
+                return TextUtils.join(", ", strings)
             }
-            return TextUtils.join(", ", strings);
+            if (genreIds == null){
+                genres = listOf()
+                return ""
+            }else{
+                val createdGenres: ArrayList<Genre> = arrayListOf()
+                val strings = arrayOfNulls<String>(genreIds!!.size)
+                for (i in genreIds!!.indices) {
+                    strings[i] = Genre.getGenreString(genreIds!![i])
+                    createdGenres.add(Genre().also { it.genreName })
+                }
+                return TextUtils.join(", ", strings)
+            }
+
         }
-        if (genreIds == null) return "";
-        String[] strings = new String[genreIds.length];
-        for (int i = 0; i < genreIds.length; i++) {
-            strings[i] = Genre.getGenreString(genreIds[i]);
-        }
-        return TextUtils.join(", ", strings);
-    }
-
-    public String getBackdropPath() {
-        return backdropPath;
-    }
-
-    public void setBackdropPath(String backdropPath) {
-        this.backdropPath = backdropPath;
-    }
-
-    public boolean getAdult() {
-        return adult;
-    }
-
-    public void setAdult(Boolean adult) {
-        this.adult = adult;
-    }
-
-    public String getOverview() {
-        return overview;
-    }
-
-    public void setOverview(String overview) {
-        this.overview = overview;
-    }
-
-    @SuppressWarnings("WeakerAccess") //Used by room library implicitly
-    public String getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
-    }
 
     /**
      * Tries to convert the received date string to local date format. In case of any errors
      * returns the original date string.
      * @return date string on of (yyyy-MM-dd) or local date format.
      */
-    public String getDisplayReleaseDate() {
-        try {
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = simpleDateFormat.parse(getReleaseDate());
-            return SimpleDateFormat.getDateInstance().format(date);
-        } catch (Exception e) {
-            e.printStackTrace();
+    val displayReleaseDate: String?
+        get() {
+            try {
+                @SuppressLint("SimpleDateFormat") val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+                val date = simpleDateFormat.parse(releaseDate)
+                return SimpleDateFormat.getDateInstance().format(date)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return releaseDate
         }
-        return getReleaseDate();
+    val videos: List<Video?>?
+        get() = videoResponse?.videos
+
+    //normal getter
+    val reviews: List<Review?>?
+        get() = reviewResponse?.reviews
+
+    override fun describeContents(): Int {
+        return 0
     }
 
-    public List<Video> getVideos() {
-        if (videoResponse == null) return null;
-        return videoResponse.getVideos();
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeInt(id)
+        dest.writeString(title)
+        dest.writeDouble(voteAverage)
+        dest.writeString(releaseDate)
+        dest.writeIntArray(genreIds)
+        dest.writeString(backdropPath)
+        dest.writeString(overview)
+        dest.writeString(posterPath)
+        dest.writeByte((if (adult) 1 else 0).toByte())
     }
 
-    @SuppressWarnings("unused") //normal getter
-    public List<Review> getReviews() {
-        if (reviewResponse == null) return null;
-        return reviewResponse.getReviews();
-    }
+    companion object CREATOR : Parcelable.Creator<Movie> {
+        override fun createFromParcel(parcel: Parcel): Movie {
+            return Movie(parcel)
+        }
 
-    public List<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeDouble(voteAverage);
-        dest.writeString(releaseDate);
-        dest.writeIntArray(genreIds);
-        dest.writeString(backdropPath);
-        dest.writeString(overview);
-        dest.writeString(posterPath);
-        dest.writeByte((byte) (adult ? 1 : 0));
+        override fun newArray(size: Int): Array<Movie?> {
+            return arrayOfNulls(size)
+        }
     }
 }

@@ -13,42 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.model.Review
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.model.Review;
-
-import java.util.Locale;
-
-public class ReviewListAdapter extends RecyclerViewAdapterTemplate<ReviewListViewHolder, Review> {
-
-    public ReviewListAdapter(Context mContext) {
-        super(mContext);
+class ReviewListAdapter(mContext: Context?) : RecyclerViewAdapterTemplate<ReviewListViewHolder, Review?>(mContext) {
+    override fun getNormalViewHolder(parent: ViewGroup): ReviewListViewHolder {
+        val rootView = LayoutInflater.from(parent.context).inflate(R.layout.movie_review_item, parent, false)
+        return ReviewListViewHolder(rootView)
     }
 
-    @Override
-    ReviewListViewHolder getNormalViewHolder(ViewGroup parent) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_review_item, parent, false);
-        return new ReviewListViewHolder(rootView);
+    override fun normalBinding(holder: ReviewListViewHolder, position: Int) {
+        val review: Review = contents!![position]!!
+        holder.review.text = review.content
+        holder.author.text = String.format(context!!.getString(R.string.review_author_template), review.author)
     }
 
-    @Override
-    void normalBinding(ReviewListViewHolder holder, int position) {
-        Review review = getContents().get(position);
-        holder.review.setText(review.getContent());
-        holder.author.setText(String.format(Locale.getDefault(),
-                getContext().getString(R.string.review_author_template),
-                review.getAuthor()));
-    }
-
-    @Override
-    String getEmptyLayoutMessage() {
-        return getContext().getString(R.string.empty_list_message);
-    }
+    override val emptyLayoutMessage: String
+        get() = context!!.getString(R.string.empty_list_message)
 }

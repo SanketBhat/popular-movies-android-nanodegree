@@ -13,14 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
-
-import com.udacity.sanketbhat.popularmovies.model.Video;
+import com.udacity.sanketbhat.popularmovies.model.Video
 
 /**
  * Class for handling the click events of the video in the detail view
  */
-public interface VideoClickListener {
-    void onVideoClicked(Video video);
+interface VideoClickListener {
+    fun onVideoClicked(video: Video)
 }

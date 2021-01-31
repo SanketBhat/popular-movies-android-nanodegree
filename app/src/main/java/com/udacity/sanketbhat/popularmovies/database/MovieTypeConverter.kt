@@ -13,85 +13,77 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.database
 
-package com.udacity.sanketbhat.popularmovies.database;
-
-
-import androidx.room.TypeConverter;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.udacity.sanketbhat.popularmovies.model.Genre;
-import com.udacity.sanketbhat.popularmovies.model.ReviewResponse;
-import com.udacity.sanketbhat.popularmovies.model.VideoResponse;
-
-import java.util.List;
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.udacity.sanketbhat.popularmovies.model.Genre
+import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
+import com.udacity.sanketbhat.popularmovies.model.VideoResponse
 
 /**
  * Class that used by Room Library to save the unsupported types into the database.
  * The custom types such as Video, Review, Genre are converted to plain JSON String
  * to store it in the local database.
  */
-class MovieTypeConverter {
-
+internal class MovieTypeConverter {
     @TypeConverter
-    public String genresToString(List<Genre> genres) {
-        Gson gson = new Gson();
-        return gson.toJson(genres);
+    fun genresToString(genres: List<Genre>): String {
+        val gson = Gson()
+        return gson.toJson(genres)
     }
 
     @TypeConverter
-    public List<Genre> stringToGenres(String genreString) {
-        Gson gson = new Gson();
-        return gson.fromJson(genreString, new TypeToken<List<Genre>>() {
-        }.getType());
+    fun stringToGenres(genreString: String): List<Genre> {
+        val gson = Gson()
+        return gson.fromJson(genreString, object : TypeToken<List<Genre>>() {}.type)
     }
 
     @TypeConverter
-    public String intArrayToString(int[] genreIds) {
-        StringBuilder stringBuilder = new StringBuilder("");
-        for (int id :
-                genreIds) {
-            stringBuilder.append(id).append(",");
+    fun intArrayToString(genreIds: IntArray): String {
+        val stringBuilder = StringBuilder("")
+        for (id in genreIds) {
+            stringBuilder.append(id).append(",")
         }
-        return stringBuilder.toString();
+        return stringBuilder.toString()
     }
 
     @TypeConverter
-    public int[] stringToIntArray(String s) {
-        String[] strings = s.split(",");
-        int[] ids = new int[strings.length];
-        for (int i = 0; i < strings.length; i++) {
+    fun stringToIntArray(s: String): IntArray {
+        val strings = s.split(",".toRegex()).toTypedArray()
+        val ids = IntArray(strings.size)
+        for (i in strings.indices) {
             try {
-                ids[i] = Integer.parseInt(strings[i]);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
+                ids[i] = strings[i].toInt()
+            } catch (e: NumberFormatException) {
+                e.printStackTrace()
             }
         }
-        return ids;
+        return ids
     }
 
     @TypeConverter
-    public String videosToString(VideoResponse videoResponse) {
-        Gson gson = new Gson();
-        return gson.toJson(videoResponse);
+    fun videosToString(videoResponse: VideoResponse?): String {
+        val gson = Gson()
+        return gson.toJson(videoResponse)
     }
 
     @TypeConverter
-    public VideoResponse stringToVideos(String jsonString) {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, VideoResponse.class);
+    fun stringToVideos(jsonString: String?): VideoResponse {
+        val gson = Gson()
+        return gson.fromJson(jsonString, VideoResponse::class.java)
     }
 
     @TypeConverter
-    public String reviewsToString(ReviewResponse reviewResponse) {
-        Gson gson = new Gson();
-        return gson.toJson(reviewResponse);
+    fun reviewsToString(reviewResponse: ReviewResponse?): String {
+        val gson = Gson()
+        return gson.toJson(reviewResponse)
     }
 
     @TypeConverter
-    public ReviewResponse stringToReviews(String jsonString) {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonString, ReviewResponse.class);
+    fun stringToReviews(jsonString: String?): ReviewResponse {
+        val gson = Gson()
+        return gson.fromJson(jsonString, ReviewResponse::class.java)
     }
 }

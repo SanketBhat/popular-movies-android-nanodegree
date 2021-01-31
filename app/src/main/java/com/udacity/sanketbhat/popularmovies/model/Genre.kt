@@ -13,80 +13,45 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
+import com.google.gson.annotations.SerializedName
 
-import com.google.gson.annotations.SerializedName;
-
-@SuppressWarnings("unused")//Some methods are used by retrofit API
+//Some methods are used by retrofit API
 //Now its using the static genre names because its not frequently changing
 // can also download it dynamically
-public class Genre {
-
+class Genre {
     @SerializedName("id")
-    private int id;
+    var id = 0
+
     @SerializedName("name")
-    private String genreName;
+    var genreName: String? = null
 
-    //Static data for genre
-    public static String getGenreString(int genreId) {
-        switch (genreId) {
-            case 12:
-                return "Adventure";
-            case 14:
-                return "Fantasy";
-            case 16:
-                return "Animation";
-            case 18:
-                return "Drama";
-            case 27:
-                return "Horror";
-            case 28:
-                return "Action";
-            case 35:
-                return "Comedy";
-            case 36:
-                return "History";
-            case 37:
-                return "Western";
-            case 80:
-                return "Crime";
-            case 99:
-                return "Documentary";
-            case 878:
-                return "Science Fiction";
-            case 9648:
-                return "Mystery";
-            case 10402:
-                return "Music";
-            case 10749:
-                return "Romance";
-            case 10751:
-                return "Family";
-            case 10752:
-                return "War";
-            case 10770:
-                return "TV Movie";
-            case 53:
-                return "Thriller";
-            default:
-                return "Unknown";
+    companion object {
+        //Static data for genre
+        fun getGenreString(genreId: Int): String {
+            return when (genreId) {
+                12 -> "Adventure"
+                14 -> "Fantasy"
+                16 -> "Animation"
+                18 -> "Drama"
+                27 -> "Horror"
+                28 -> "Action"
+                35 -> "Comedy"
+                36 -> "History"
+                37 -> "Western"
+                80 -> "Crime"
+                99 -> "Documentary"
+                878 -> "Science Fiction"
+                9648 -> "Mystery"
+                10402 -> "Music"
+                10749 -> "Romance"
+                10751 -> "Family"
+                10752 -> "War"
+                10770 -> "TV Movie"
+                53 -> "Thriller"
+                else -> "Unknown"
+            }
         }
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getGenreName() {
-        return genreName;
-    }
-
-    public void setGenreName(String genreName) {
-        this.genreName = genreName;
     }
 }

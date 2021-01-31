@@ -13,51 +13,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.squareup.picasso.Picasso
+import com.udacity.sanketbhat.popularmovies.R
+import com.udacity.sanketbhat.popularmovies.model.Video
+import java.util.*
 
-import android.content.Context;
-import androidx.annotation.NonNull;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.squareup.picasso.Picasso;
-import com.udacity.sanketbhat.popularmovies.R;
-import com.udacity.sanketbhat.popularmovies.model.Video;
-
-import java.util.Locale;
-
-public class VideoListAdapter extends RecyclerViewAdapterTemplate<VideoListViewHolder, Video> {
-
-    private static final String YOUTUBE_THUMBNAIL_TEMPLATE = "http://img.youtube.com/vi/%s/mqdefault.jpg";
-    private static final String YOUTUBE_VIDEO_SOURCE = "youtube";
-    private final VideoClickListener clickListener;
-    private final Context mContext;
-
-    public VideoListAdapter(@NonNull Context context, @NonNull VideoClickListener clickListener) {
-        super(context);
-        mContext = context;
-        this.clickListener = clickListener;
+class VideoListAdapter(private val mContext: Context, private val clickListener: VideoClickListener) : RecyclerViewAdapterTemplate<VideoListViewHolder, Video?>(mContext) {
+    override fun getNormalViewHolder(parent: ViewGroup): VideoListViewHolder {
+        val rootView = LayoutInflater.from(parent.context).inflate(R.layout.movie_video_item, parent, false)
+        return VideoListViewHolder(rootView)
     }
 
-    @Override
-    VideoListViewHolder getNormalViewHolder(ViewGroup parent) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_video_item, parent, false);
-        return new VideoListViewHolder(rootView);
-    }
-
-    @Override
-    void normalBinding(VideoListViewHolder holder, int position) {
+    override fun normalBinding(holder: VideoListViewHolder, position: Int) {
+        var video = contents!![position] as Video
         Picasso.with(mContext)
-                .load(String.format(Locale.getDefault(), YOUTUBE_THUMBNAIL_TEMPLATE, getContents().get(position).getKey()))
-                .into(holder.videoThumbnail);
-        if (getContents().get(position).getSite().equalsIgnoreCase(YOUTUBE_VIDEO_SOURCE))
-            holder.itemView.setOnClickListener(v -> clickListener.onVideoClicked(getContents().get(position)));
+                .load(String.format(Locale.getDefault(), YOUTUBE_THUMBNAIL_TEMPLATE, video.key))
+                .into(holder.videoThumbnail)
+        if (video.site.equals(YOUTUBE_VIDEO_SOURCE, ignoreCase = true))
+            holder.itemView.setOnClickListener { clickListener.onVideoClicked(video) }
     }
 
-    @Override
-    String getEmptyLayoutMessage() {
-        return mContext.getString(R.string.video_list_empty_message);
+    override val emptyLayoutMessage: String
+        get() = mContext.getString(R.string.video_list_empty_message)
+
+    companion object {
+        private const val YOUTUBE_THUMBNAIL_TEMPLATE = "http://img.youtube.com/vi/%s/mqdefault.jpg"
+        private const val YOUTUBE_VIDEO_SOURCE = "youtube"
     }
 }

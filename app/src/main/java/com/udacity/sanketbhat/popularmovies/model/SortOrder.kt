@@ -13,28 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
-
-public class SortOrder {
-    public static final int SORT_ORDER_POPULAR = 1;
-    public static final int SORT_ORDER_TOP_RATED = 2;
-
-    public static final int SORT_ORDER_DEFAULT = SORT_ORDER_POPULAR;
-
-    private static final String URL_PATH_POPULAR = "popular";
-    private static final String URL_PATH_TOP_RATED = "top_rated";
-
-    public static String getSortOrderPath(int sortOrder) {
-        switch (sortOrder) {
-            case SORT_ORDER_POPULAR:
-                return URL_PATH_POPULAR;
-
-            case SORT_ORDER_TOP_RATED:
-                return URL_PATH_TOP_RATED;
-
-            default:
-                return URL_PATH_POPULAR;
+object SortOrder {
+    const val SORT_ORDER_POPULAR = 1
+    const val SORT_ORDER_TOP_RATED = 2
+    const val SORT_ORDER_DEFAULT = SORT_ORDER_POPULAR
+    private const val URL_PATH_POPULAR = "popular"
+    private const val URL_PATH_TOP_RATED = "top_rated"
+    @kotlin.jvm.JvmStatic
+    fun getSortOrderPath(sortOrder: Int): String {
+        return when (sortOrder) {
+            SORT_ORDER_POPULAR -> URL_PATH_POPULAR
+            SORT_ORDER_TOP_RATED -> URL_PATH_TOP_RATED
+            else -> URL_PATH_POPULAR
         }
     }
 }

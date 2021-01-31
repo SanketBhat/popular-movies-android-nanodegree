@@ -13,47 +13,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.util
 
-package com.udacity.sanketbhat.popularmovies.util;
+import android.net.Uri
 
-import android.net.Uri;
-
-public class ImageUrlBuilder {
-    private static final String SCHEME = "https";
-    private static final String AUTHORITY_IMAGE = "image.tmdb.org";
-    private static final String IMAGE_DEFAULT_PATH = "t/p";
-
-    private static final int POSTER_IMAGE = 1;
-    private static final int BACKDROP_IMAGE = 2;
-
-    private static String getImageUrl(String path, int imageType) {
-        Uri.Builder builder = new Uri.Builder()
+object ImageUrlBuilder {
+    private const val SCHEME = "https"
+    private const val AUTHORITY_IMAGE = "image.tmdb.org"
+    private const val IMAGE_DEFAULT_PATH = "t/p"
+    private const val POSTER_IMAGE = 1
+    private const val BACKDROP_IMAGE = 2
+    private fun getImageUrl(path: String?, imageType: Int): String {
+        val builder = Uri.Builder()
                 .scheme(SCHEME)
                 .authority(AUTHORITY_IMAGE)
                 .appendEncodedPath(IMAGE_DEFAULT_PATH)
                 .appendEncodedPath(getConfigurationString(imageType))
-                .appendEncodedPath(path);
-        return builder.toString();
+                .appendEncodedPath(path)
+        return builder.toString()
     }
 
-    public static String getPosterUrlString(String path) {
-        return getImageUrl(path, POSTER_IMAGE);
+    @kotlin.jvm.JvmStatic
+    fun getPosterUrlString(path: String?): String {
+        return getImageUrl(path, POSTER_IMAGE)
     }
 
-    public static String getBackdropUrlString(String path) {
-        return getImageUrl(path, BACKDROP_IMAGE);
+    @kotlin.jvm.JvmStatic
+    fun getBackdropUrlString(path: String?): String {
+        return getImageUrl(path, BACKDROP_IMAGE)
     }
 
-    private static String getConfigurationString(int imageType) {
-        switch (imageType) {
-            case POSTER_IMAGE:
-                return "w342";
-
-            case BACKDROP_IMAGE:
-                return "w780";
-
-            default:
-                return "w185";
+    private fun getConfigurationString(imageType: Int): String {
+        return when (imageType) {
+            POSTER_IMAGE -> "w342"
+            BACKDROP_IMAGE -> "w780"
+            else -> "w185"
         }
     }
 }

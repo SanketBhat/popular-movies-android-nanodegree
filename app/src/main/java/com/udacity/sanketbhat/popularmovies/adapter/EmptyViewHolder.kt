@@ -13,22 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
-
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.widget.TextView;
-
-import com.udacity.sanketbhat.popularmovies.R;
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
 /**
  * Class for showing empty message when there are no videos or reviews for a movie
  */
-class EmptyViewHolder extends RecyclerView.ViewHolder {
-    EmptyViewHolder(View itemView, String text) {
-        super(itemView);
+internal class EmptyViewHolder(itemView: View, text: String?) : RecyclerView.ViewHolder(itemView) {
+    init {
         //Show the empty content message in a textView
-        ((TextView) itemView.findViewById(R.id.empty_text_view)).setText(text);
+        (itemView.findViewById<View>(R.id.empty_text_view) as TextView).text = text
     }
 }

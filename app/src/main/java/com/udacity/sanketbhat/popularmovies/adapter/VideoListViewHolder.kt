@@ -13,20 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
+import android.view.View
+import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-
-import com.udacity.sanketbhat.popularmovies.R;
-
-class VideoListViewHolder extends RecyclerView.ViewHolder {
-    public final ImageView videoThumbnail;
-
-    VideoListViewHolder(View itemView) {
-        super(itemView);
-        videoThumbnail = itemView.findViewById(R.id.movie_video_image);
-    }
+class VideoListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val videoThumbnail: ImageView = itemView.findViewById(R.id.movie_video_image)
 }

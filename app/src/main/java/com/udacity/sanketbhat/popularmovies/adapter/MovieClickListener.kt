@@ -13,17 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
-
-import android.view.View;
-
-import com.udacity.sanketbhat.popularmovies.model.Movie;
+import android.view.View
+import com.udacity.sanketbhat.popularmovies.model.Movie
 
 /**
  * Event listener for movie item click event
  */
-public interface MovieClickListener {
+interface MovieClickListener {
     //OnClick Listener for Movie item
-    void onClickItem(View v, Movie movie);
+    fun onClickItem(v: View?, movie: Movie?)
 }

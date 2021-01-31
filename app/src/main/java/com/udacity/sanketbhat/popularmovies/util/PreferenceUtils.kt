@@ -13,30 +13,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.util
 
-package com.udacity.sanketbhat.popularmovies.util;
+import android.content.Context
+import android.preference.PreferenceManager
+import com.udacity.sanketbhat.popularmovies.model.SortOrder
 
-import android.content.Context;
-import android.preference.PreferenceManager;
-
-import com.udacity.sanketbhat.popularmovies.model.SortOrder;
-
-public class PreferenceUtils {
-    private static final String PREFERRED_SORT_ORDER = "preferredSortOrder";
-
-    public static int getPreferredSortOrder(Context context) {
+object PreferenceUtils {
+    private const val PREFERRED_SORT_ORDER = "preferredSortOrder"
+    @kotlin.jvm.JvmStatic
+    fun getPreferredSortOrder(context: Context?): Int {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getInt(PREFERRED_SORT_ORDER, SortOrder.SORT_ORDER_DEFAULT);
+                .getInt(PREFERRED_SORT_ORDER, SortOrder.SORT_ORDER_DEFAULT)
     }
 
-    public static void setPreferredSortOrder(Context context, int sortOrder) {
+    @kotlin.jvm.JvmStatic
+    fun setPreferredSortOrder(context: Context?, sortOrder: Int) {
         if (sortOrder == SortOrder.SORT_ORDER_POPULAR || sortOrder == SortOrder.SORT_ORDER_TOP_RATED) {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .edit()
                     .putInt(PREFERRED_SORT_ORDER, sortOrder)
-                    .apply();
+                    .apply()
         } else {
-            throw new IllegalArgumentException("Unsupported Sort order");
+            throw IllegalArgumentException("Unsupported Sort order")
         }
     }
 }

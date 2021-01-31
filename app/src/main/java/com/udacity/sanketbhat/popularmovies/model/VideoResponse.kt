@@ -13,25 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
+import com.google.gson.annotations.SerializedName
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
-@SuppressWarnings("unused")//Some methods are used by retrofit API
-public class VideoResponse {
-
+//Some methods are used by retrofit API
+class VideoResponse {
     @SerializedName("results")
-    private List<Video> videos;
-
-    public List<Video> getVideos() {
-        return videos;
-    }
-
-    public void setVideos(List<Video> videos) {
-        this.videos = videos;
-    }
-
+    var videos: List<Video>? = null
 }

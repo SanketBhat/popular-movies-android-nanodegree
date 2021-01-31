@@ -13,18 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-package com.udacity.sanketbhat.popularmovies.adapter;
-
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * Class used for showing progress indicator when videoList or
  * reviewList is loading
  */
-class ProgressViewHolder extends RecyclerView.ViewHolder {
-    ProgressViewHolder(View itemView) {
-        super(itemView);
-    }
-}
+internal class ProgressViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)

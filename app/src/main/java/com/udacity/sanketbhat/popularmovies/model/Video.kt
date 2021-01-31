@@ -13,65 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-package com.udacity.sanketbhat.popularmovies.model;
+import com.google.gson.annotations.SerializedName
 
-import com.google.gson.annotations.SerializedName;
-
-@SuppressWarnings("unused")//Some methods are used by retrofit API
-public class Video {
+//Some methods are used by retrofit API
+class Video {
     @SerializedName("id")
-    private String id;
+    var id: String? = null
 
     @SerializedName("key")
-    private String key;
+    var key: String? = null
 
     @SerializedName("name")
-    private String name;
+    var name: String? = null
 
     @SerializedName("site")
-    private String site;
+    var site: String? = null
 
     @SerializedName("type")
-    private String type;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSite() {
-        return site;
-    }
-
-    public void setSite(String site) {
-        this.site = site;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    var type: String? = null
 }
