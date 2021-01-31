@@ -19,7 +19,8 @@ import android.annotation.SuppressLint
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 
@@ -63,7 +64,7 @@ class Movie : Parcelable {
     @SerializedName("reviews")
     var reviewResponse: ReviewResponse? = null
 
-    constructor() {}
+    constructor()
     protected constructor(`in`: Parcel) {
         id = `in`.readInt()
         title = `in`.readString()
@@ -92,20 +93,14 @@ class Movie : Parcelable {
                 }
                 return TextUtils.join(", ", strings)
             }
-            if (genreIds == null){
-                genres = listOf()
-                return ""
-            }else{
-                val createdGenres: ArrayList<Genre> = arrayListOf()
-                val strings = arrayOfNulls<String>(genreIds!!.size)
-                for (i in genreIds!!.indices) {
-                    strings[i] = Genre.getGenreString(genreIds!![i])
-                    createdGenres.add(Genre().also { it.genreName })
-                }
-                return TextUtils.join(", ", strings)
+            if (genreIds == null) return ""
+            val strings = arrayOfNulls<String>(genreIds!!.size)
+            for (i in genreIds!!.indices) {
+                strings[i] = Genre.getGenreString(genreIds!![i])
             }
-
+            return TextUtils.join(", ", strings)
         }
+
 
     /**
      * Tries to convert the received date string to local date format. In case of any errors

@@ -29,13 +29,14 @@ import com.udacity.sanketbhat.popularmovies.model.VideoResponse
  */
 internal class MovieTypeConverter {
     @TypeConverter
-    fun genresToString(genres: List<Genre>): String {
+    fun genresToString(genres: List<Genre>?): String {
+        if (genres == null) return "[]"
         val gson = Gson()
         return gson.toJson(genres)
     }
 
     @TypeConverter
-    fun stringToGenres(genreString: String): List<Genre> {
+    fun stringToGenres(genreString: String): List<Genre>? {
         val gson = Gson()
         return gson.fromJson(genreString, object : TypeToken<List<Genre>>() {}.type)
     }

@@ -42,7 +42,7 @@ class VideoListAdapter(private val mContext: Context, private val clickListener:
         get() = mContext.getString(R.string.video_list_empty_message)
 
     companion object {
-        private const val YOUTUBE_THUMBNAIL_TEMPLATE = "http://img.youtube.com/vi/%s/mqdefault.jpg"
+        private const val YOUTUBE_THUMBNAIL_TEMPLATE = "https://img.youtube.com/vi/%s/mqdefault.jpg"
         private const val YOUTUBE_VIDEO_SOURCE = "youtube"
     }
 }
