@@ -13,29 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-buildscript {
-    ext.kotlin_version = '1.4.21'
+//Some methods are used by retrofit API
+class PageResponse {
+    @SerializedName("page")
+    @Expose
+    var page: Int? = null
 
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+    @SerializedName("total_results")
+    @Expose
+    var totalResults: Int? = null
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
+    @SerializedName("total_pages")
+    @Expose
+    var totalPages: Int? = null
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    @SerializedName("results")
+    @Expose
+    var movies: List<Movie>? = null
 }

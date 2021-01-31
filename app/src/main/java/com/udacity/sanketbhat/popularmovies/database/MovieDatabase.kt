@@ -13,29 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.database
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.udacity.sanketbhat.popularmovies.model.Movie
 
-buildscript {
-    ext.kotlin_version = '1.4.21'
-
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+@Database(entities = [Movie::class], version = 1, exportSchema = false)
+@TypeConverters(MovieTypeConverter::class)
+abstract class MovieDatabase : RoomDatabase() {
+    abstract val movieDao: MovieDao?
 }

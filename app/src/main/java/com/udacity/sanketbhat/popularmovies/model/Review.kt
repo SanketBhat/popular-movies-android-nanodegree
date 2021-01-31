@@ -13,29 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.google.gson.annotations.SerializedName
 
-buildscript {
-    ext.kotlin_version = '1.4.21'
+//Some methods are used by retrofit API
+class Review {
+    @SerializedName("author")
+    var author: String? = null
 
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+    @SerializedName("content")
+    var content: String? = null
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
+    @SerializedName("id")
+    var id: String? = null
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    @SerializedName("url")
+    var url: String? = null
 }

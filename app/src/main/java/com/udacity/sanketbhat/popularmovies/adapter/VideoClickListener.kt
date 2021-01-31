@@ -13,29 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.udacity.sanketbhat.popularmovies.model.Video
 
-buildscript {
-    ext.kotlin_version = '1.4.21'
-
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+/**
+ * Class for handling the click events of the video in the detail view
+ */
+interface VideoClickListener {
+    fun onVideoClicked(video: Video)
 }

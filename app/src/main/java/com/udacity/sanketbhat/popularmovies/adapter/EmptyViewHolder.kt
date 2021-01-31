@@ -13,29 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.adapter
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
-buildscript {
-    ext.kotlin_version = '1.4.21'
-
-    repositories {
-        google()
-        jcenter()
+/**
+ * Class for showing empty message when there are no videos or reviews for a movie
+ */
+internal class EmptyViewHolder(itemView: View, text: String?) : RecyclerView.ViewHolder(itemView) {
+    init {
+        //Show the empty content message in a textView
+        (itemView.findViewById<View>(R.id.empty_text_view) as TextView).text = text
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }

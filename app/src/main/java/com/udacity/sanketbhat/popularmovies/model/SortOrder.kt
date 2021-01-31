@@ -13,29 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.udacity.sanketbhat.popularmovies.model
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
-buildscript {
-    ext.kotlin_version = '1.4.21'
-
-    repositories {
-        google()
-        jcenter()
+object SortOrder {
+    const val SORT_ORDER_POPULAR = 1
+    const val SORT_ORDER_TOP_RATED = 2
+    const val SORT_ORDER_DEFAULT = SORT_ORDER_POPULAR
+    private const val URL_PATH_POPULAR = "popular"
+    private const val URL_PATH_TOP_RATED = "top_rated"
+    @kotlin.jvm.JvmStatic
+    fun getSortOrderPath(sortOrder: Int): String {
+        return when (sortOrder) {
+            SORT_ORDER_POPULAR -> URL_PATH_POPULAR
+            SORT_ORDER_TOP_RATED -> URL_PATH_TOP_RATED
+            else -> URL_PATH_POPULAR
+        }
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
