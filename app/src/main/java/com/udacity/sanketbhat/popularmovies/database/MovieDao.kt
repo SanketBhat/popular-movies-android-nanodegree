@@ -16,6 +16,7 @@
 package com.udacity.sanketbhat.popularmovies.database
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.udacity.sanketbhat.popularmovies.model.Movie
 import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
@@ -35,8 +36,8 @@ interface MovieDao {
     @Query("SELECT * FROM favorites WHERE id = :id")
     fun getMovie(id: Int): Movie?
 
-    @get:Query("SELECT * FROM favorites ORDER BY title ASC")
-    val allMovies: LiveData<List<Movie>>
+    @Query("SELECT * FROM favorites ORDER BY title ASC")
+    fun allMovies(): PagingSource<Int, Movie>
 
     @Query("UPDATE favorites SET videoResponse = :videoResponse WHERE id = :id")
     fun updateVideos(id: Int, videoResponse: VideoResponse?)

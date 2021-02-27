@@ -25,7 +25,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.paging.PagingDataAdapter
 import androidx.palette.graphics.Palette
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Picasso.LoadedFrom
@@ -35,77 +37,30 @@ import com.udacity.sanketbhat.popularmovies.model.Movie
 import com.udacity.sanketbhat.popularmovies.ui.MovieListActivity
 import com.udacity.sanketbhat.popularmovies.util.ImageUrlBuilder
 
-class MovieListAdapter(private val mContext: Context, private var movies: List<Movie>?, private val clickListener: MovieClickListener?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    //Boolean flag for showing or not showing the loading indicator at the end of the grid.
-    private var loading = false
+class MovieListAdapter(
+        private val mContext: Context,
+        private val clickListener: MovieClickListener?
+) : PagingDataAdapter<Movie, RecyclerView.ViewHolder>(MOVIE_COMPARATOR) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            VIEW_TYPE_MOVIE -> {
-                val inflatedView = LayoutInflater.from(parent.context).inflate(R.layout.movie_grid_item, parent, false)
-                ViewHolder(inflatedView)
-            }
-            VIEW_TYPE_PROGRESS -> {
-                val progressView = LayoutInflater.from(parent.context).inflate(R.layout.grid_loading_indicator, parent, false)
-                ProgressViewHolder(progressView)
-            }
-            else -> throw IllegalArgumentException("Unsupported View type")
-        }
+        val inflatedView = LayoutInflater.from(parent.context).inflate(R.layout.movie_grid_item, parent, false)
+        return ViewHolder(inflatedView)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (getItemViewType(position)) {
-            VIEW_TYPE_MOVIE -> if (holder is ViewHolder) {
-                //Bind view with data
-                val viewHolder = holder
-                val movie = movies!![position]
-                viewHolder.movieGenre.text = movie.genresString
-                viewHolder.movieName.text = movie.title
-                Picasso.with(mContext)
-                        .load(ImageUrlBuilder.getPosterUrlString(movie.posterPath))
-                        .tag(MovieListActivity::class.java.simpleName)
-                        .error(R.drawable.ic_movie_grid_item_image_error)
-                        .placeholder(R.drawable.ic_loading_indicator)
-                        .into(viewHolder.target)
-            }
-            VIEW_TYPE_PROGRESS -> {
-            }
-            else -> throw IllegalArgumentException("Unsupported View type")
+        if (holder is ViewHolder) {
+            //Bind view with data
+            val movie = getItem(position)
+            holder.bind(movie)
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return VIEW_TYPE_MOVIE
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         //Cleanup resources after viewHolder recycled
         if (holder is ViewHolder) holder.cleanUp()
-    }
-
-    override fun getItemCount(): Int {
-        //If movies = null return 0, or if next page is loading return size of movies + 1
-        //Else its normal, return movies.size()
-        return if (movies == null) 0 else if (loading) movies!!.size + 1 else movies!!.size
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        //If loading new page, return last element type as loading indicator
-        return if (position == movies!!.size && isLoading()) VIEW_TYPE_PROGRESS else VIEW_TYPE_MOVIE
-    }
-
-    fun isLoading(): Boolean {
-        return loading
-    }
-
-    fun setLoading(loading: Boolean) {
-        if (this.loading != loading) {
-            //If loading is finished due to error or successful response-
-            //notify the list to hide the loading indicator
-            this.loading = loading
-            notifyDataSetChanged()
-        }
-    }
-
-    //Swap the new available list with the current one
-    fun swapMovies(movies: List<Movie>?) {
-        this.movies = movies
-        notifyDataSetChanged()
     }
 
     //ViewHolder for normal movie item.
@@ -119,8 +74,21 @@ class MovieListAdapter(private val mContext: Context, private var movies: List<M
             itemView.setOnClickListener(this)
         }
 
+        fun bind(movie: Movie?) {
+            movie?.let {
+                movieGenre.text = movie.genresString
+                movieName.text = movie.title
+                Picasso.with(mContext)
+                        .load(ImageUrlBuilder.getPosterUrlString(movie.posterPath))
+                        .tag(MovieListActivity::class.java.simpleName)
+                        .error(R.drawable.ic_movie_grid_item_image_error)
+                        .placeholder(R.drawable.ic_loading_indicator)
+                        .into(target)
+            }
+        }
+
         private var cardBackground = 0
-        val target: Target = object : Target {
+        private val target: Target = object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap, from: LoadedFrom) {
                 try {
                     if (cardBackground == 0) {
@@ -148,7 +116,10 @@ class MovieListAdapter(private val mContext: Context, private var movies: List<M
         }
 
         override fun onClick(v: View) {
-            clickListener?.onClickItem(v, movies!![adapterPosition])
+            getItem(bindingAdapterPosition)?.let {
+                clickListener?.onClickItem(v, it)
+            }
+
         }
 
         fun cleanUp() {
@@ -160,13 +131,20 @@ class MovieListAdapter(private val mContext: Context, private var movies: List<M
         }
     }
 
-    //View Holder for progress indicator
-    internal inner class ProgressViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)
     companion object {
         //Two view types
         // -> 1. For normal movie grid item.
         // -> 2. For the loading indicator at the end.
         const val VIEW_TYPE_MOVIE = 1
         const val VIEW_TYPE_PROGRESS = 2
+        private val MOVIE_COMPARATOR = object : DiffUtil.ItemCallback<Movie>() {
+            override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                return oldItem.id == newItem.id
+            }
+            override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                //Comparing only visible items
+                return (oldItem.id == newItem.id && oldItem.genresString == newItem.genresString && oldItem.posterPath == newItem.posterPath)
+            }
+        }
     }
 }

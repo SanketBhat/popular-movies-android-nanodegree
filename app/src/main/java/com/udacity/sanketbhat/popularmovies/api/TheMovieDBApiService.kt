@@ -29,7 +29,7 @@ interface TheMovieDBApiService {
     fun getFirstPage(@Path("type") sortOrderPath: String?): Call<PageResponse?>?
 
     @GET("{type}?api_key=$API_KEY")
-    fun getPage(@Path("type") sortOrderPath: String?, @Query("page") pageNumber: Int): Call<PageResponse?>?
+    suspend fun getPage(@Path("type") sortOrderPath: String?, @Query("page") pageNumber: Int): PageResponse
 
     @GET("{id}/videos?api_key=$API_KEY")
     fun getVideos(@Path("id") id: Int): Call<VideoResponse?>?

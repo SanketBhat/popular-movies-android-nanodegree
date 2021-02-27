@@ -16,9 +16,6 @@
 package com.udacity.sanketbhat.popularmovies.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -26,21 +23,33 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.udacity.sanketbhat.popularmovies.R
 import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
 import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager
 import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter
+import com.udacity.sanketbhat.popularmovies.adapter.MovieLoadStateAdapter
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFragmentBinding
-import com.udacity.sanketbhat.popularmovies.model.Movie
 import com.udacity.sanketbhat.popularmovies.model.SortOrder
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 class MovieListFragment : Fragment() {
     private lateinit var viewModel: MovieListViewModel
     private var mBinding: ActivityMovieListFragmentBinding? = null
     private var gridLayoutManager: MovieGridLayoutManager? = null
     private var adapter: MovieListAdapter? = null
+    private var movieRequestJob: Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MovieListViewModel::class.java)
@@ -51,12 +60,13 @@ class MovieListFragment : Fragment() {
         setActivityTitle()
         val rootView = inflater.inflate(R.layout.activity_movie_list_fragment, container, false)
         mBinding = DataBindingUtil.bind(rootView)
-        if (mBinding != null) {
-            setupRecyclerView(mBinding!!.movieList)
-            mBinding!!.movieListErrorRetryButton.setOnClickListener { loadFirstPage(true) }
-            loadFirstPage(false)
-            observeViewModel()
+        mBinding?.let { mBinding ->
+            showMovieList()
+            setupRecyclerView(mBinding.movieList)
+            mBinding.movieListErrorRetryButton.setOnClickListener { adapter?.refresh() }
+            requestForMovies()
         }
+
         return rootView
     }
 
@@ -70,12 +80,20 @@ class MovieListFragment : Fragment() {
         }
     }
 
+    private fun requestForMovies() {
+        movieRequestJob?.cancel()
+        movieRequestJob = lifecycleScope.launch {
+            viewModel.getPagedMovies(getPreferredSortOrder(context)).collectLatest {
+                adapter?.submitData(it)
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_sort_popularity, R.id.menu_sort_rating -> {
-                gridLayoutManager!!.scrollToPosition(0)
-                adapter!!.swapMovies(null)
-                loadFirstPage(false)
+                adapter?.submitData(lifecycle, PagingData.empty())
+                requestForMovies()
                 setActivityTitle()
                 return true
             }
@@ -85,73 +103,49 @@ class MovieListFragment : Fragment() {
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         //Initialize adapter with null movie items. Because it will be set once it is available
-        adapter = MovieListAdapter(context!!, null, activity as MovieClickListener?)
-        recyclerView.adapter = adapter
-        gridLayoutManager = MovieGridLayoutManager(context!!, adapter!!)
+        adapter = MovieListAdapter(context!!, activity as MovieClickListener?)
+
+        adapter?.addLoadStateListener { loadState ->
+            when (loadState.source.refresh) {
+                is LoadState.NotLoading -> showMovieList()
+                is LoadState.Loading -> showMovieLoading()
+                is LoadState.Error -> showErrorLayout()
+            }
+        }
+        lifecycleScope.launch {
+            adapter?.loadStateFlow
+                    // Only emit when REFRESH LoadState for RemoteMediator changes.
+                    ?.distinctUntilChangedBy { it.refresh }
+                    // Only react to cases where Remote REFRESH completes i.e., NotLoading.
+                    ?.filter { it.refresh is LoadState.NotLoading }
+                    ?.collect { mBinding?.movieList?.scrollToPosition(0) }
+        }
+
+        val footerAdapter = MovieLoadStateAdapter{adapter?.retry()}
+        adapter?.addLoadStateListener { loadState -> footerAdapter.loadState = loadState.append }
+        val concatAdapter = ConcatAdapter(ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),adapter, footerAdapter);
+        recyclerView.adapter = concatAdapter
+        gridLayoutManager = MovieGridLayoutManager(context!!, recyclerView.adapter!!)
         recyclerView.layoutManager = gridLayoutManager
         recyclerView.setHasFixedSize(true)
-
-        //Scroll listener for loading next page once user reach end of the page.
-        recyclerView.addOnScrollListener(MovieListScrollListener())
-    }
-
-    private fun loadFirstPage(retrying: Boolean) {
-        //Loading first page with the loading layout
-        showMovieLoading()
-        viewModel.getFirstPage(getPreferredSortOrder(context), retrying)
-    }
-
-    private fun observeViewModel() {
-        //Observe loading indicator so that adapter can display loading for next page.
-        viewModel.loadingIndicator?.observe(viewLifecycleOwner, { loading: Boolean? -> if (loading != null) adapter!!.setLoading(loading) })
-
-        //Failure indicator for showing error message that user can understand
-        viewModel.failureIndicator?.observe(viewLifecycleOwner, {
-            if (adapter!!.isLoading()) {
-                //Error when loading nextPage
-                Log.i("MovieListActivity", "Error when loading next page")
-            } else if (adapter!!.itemCount == 0) {
-                showErrorLayout()
-            }
-        })
-
-        //Whenever the movie list changes it notifies the adapter
-        viewModel.movies?.observe(viewLifecycleOwner, { movies: List<Movie>? ->
-            showMovieList()
-            adapter!!.swapMovies(movies)
-        })
     }
 
     //Helper methods for showing three different layouts list, loading, error.
     private fun showMovieList() {
-        mBinding!!.movieList.visibility = View.VISIBLE
-        mBinding!!.movieLoadProgress.visibility = View.GONE
-        mBinding!!.movieListErrorLayout.visibility = View.GONE
+        mBinding?.movieList?.visibility = View.VISIBLE
+        mBinding?.movieLoadProgress?.visibility = View.GONE
+        mBinding?.movieListErrorLayout?.visibility = View.GONE
     }
 
     private fun showMovieLoading() {
-        mBinding!!.movieList.visibility = View.GONE
-        mBinding!!.movieLoadProgress.visibility = View.VISIBLE
-        mBinding!!.movieListErrorLayout.visibility = View.GONE
+        mBinding?.movieList?.visibility = View.GONE
+        mBinding?.movieLoadProgress?.visibility = View.VISIBLE
+        mBinding?.movieListErrorLayout?.visibility = View.GONE
     }
 
     private fun showErrorLayout() {
-        mBinding!!.movieList.visibility = View.GONE
-        mBinding!!.movieLoadProgress.visibility = View.GONE
-        mBinding!!.movieListErrorLayout.visibility = View.VISIBLE
-    }
-
-    //Custom scroll listener for endless list implementation
-    internal inner class MovieListScrollListener : RecyclerView.OnScrollListener() {
-        private val handler = Handler(Looper.getMainLooper())
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
-            val itemCount = gridLayoutManager!!.itemCount
-            val visibleItemCount = gridLayoutManager!!.childCount
-            val lastVisiblePosition = gridLayoutManager!!.findLastVisibleItemPosition()
-            if (visibleItemCount + lastVisiblePosition + 4 >= itemCount && !viewModel.isLastPage) {
-                handler.post { viewModel.nextPage }
-            }
-        }
+        mBinding?.movieList?.visibility = View.GONE
+        mBinding?.movieLoadProgress?.visibility = View.GONE
+        mBinding?.movieListErrorLayout?.visibility = View.VISIBLE
     }
 }
