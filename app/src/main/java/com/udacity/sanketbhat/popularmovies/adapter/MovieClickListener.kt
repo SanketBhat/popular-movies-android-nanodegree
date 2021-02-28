@@ -15,7 +15,6 @@
  */
 package com.udacity.sanketbhat.popularmovies.adapter
 
-import android.view.View
 import com.udacity.sanketbhat.popularmovies.model.Movie
 
 /**
@@ -23,5 +22,5 @@ import com.udacity.sanketbhat.popularmovies.model.Movie
  */
 interface MovieClickListener {
     //OnClick Listener for Movie item
-    fun onClickItem(v: View?, movie: Movie?)
+    fun onClickItem(movie: Movie)
 }

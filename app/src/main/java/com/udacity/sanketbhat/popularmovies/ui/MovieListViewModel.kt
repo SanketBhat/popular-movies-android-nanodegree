@@ -17,19 +17,24 @@ package com.udacity.sanketbhat.popularmovies.ui
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.udacity.sanketbhat.popularmovies.MovieRepository.Companion.getInstance
 import com.udacity.sanketbhat.popularmovies.model.Movie
 import com.udacity.sanketbhat.popularmovies.model.SortOrder
+import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
 import kotlinx.coroutines.flow.Flow
 
 //Accessed by android library
 class MovieListViewModel(application: Application?) : AndroidViewModel(application!!) {
 
     private var repo = getInstance(getApplication<Application>().applicationContext)
-    private var currentSortOrder: String? = null
+    var currentSortOrderLiveData = MutableLiveData<String?>(null)
+    val sortOrder: LiveData<String?> = currentSortOrderLiveData
+    var currentSortOrder: String? = null
     private var currentMovieResult: Flow<PagingData<Movie>>? = null
     private var favoriteMovieList: Flow<PagingData<Movie>>? = null
 
@@ -42,8 +47,9 @@ class MovieListViewModel(application: Application?) : AndroidViewModel(applicati
         return newList
     }
 
-    fun getPagedMovies(sortOrder: Int): Flow<PagingData<Movie>> {
-        val newSortOrder = SortOrder.getSortOrderPath(sortOrder)
+    fun getPagedMovies(sortOrder: String?): Flow<PagingData<Movie>> {
+        val newSortOrder =
+            sortOrder ?: SortOrder.getSortOrderPath(getPreferredSortOrder(getApplication()))
         val lastResult = currentMovieResult
         if (newSortOrder == currentSortOrder && lastResult != null) {
             return lastResult

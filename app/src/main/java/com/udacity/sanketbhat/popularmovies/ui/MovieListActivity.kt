@@ -18,18 +18,19 @@ package com.udacity.sanketbhat.popularmovies.ui
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import android.widget.ImageView
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.squareup.picasso.Picasso
 import com.udacity.sanketbhat.popularmovies.R
 import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
-import com.udacity.sanketbhat.popularmovies.model.*
+import com.udacity.sanketbhat.popularmovies.model.Movie
+import com.udacity.sanketbhat.popularmovies.model.SortOrder
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.setPreferredSortOrder
 
@@ -126,7 +127,7 @@ class MovieListActivity : AppCompatActivity(), MovieClickListener, FragmentManag
         }
     }
 
-    override fun onClickItem(v: View?, movie: Movie?) {
+    override fun onClickItem(movie: Movie) {
         //Pass the clicked movie item.
         //It will be removed in stage 2.
         val arguments = Bundle()
@@ -141,16 +142,10 @@ class MovieListActivity : AppCompatActivity(), MovieClickListener, FragmentManag
                     .replace(R.id.movie_detail_container, fragment)
                     .commit()
         } else {
-            //Prepare items for shared element transactions
-            val imageView = v!!.findViewById<ImageView>(R.id.movie_grid_item_image)
-            val transition = ActivityOptionsCompat
-                    .makeSceneTransitionAnimation(this, imageView, getString(R.string.shared_element_transition_name))
-                    .toBundle()
-
             //If not twoPane layout start the MovieDetailActivity
             val intent = Intent(this, MovieDetailActivity::class.java)
             intent.putExtras(arguments)
-            startActivity(intent, transition)
+            startActivity(intent)
         }
     }
 

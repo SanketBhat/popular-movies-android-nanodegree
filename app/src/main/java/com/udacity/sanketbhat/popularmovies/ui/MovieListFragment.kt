@@ -20,35 +20,22 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.udacity.sanketbhat.popularmovies.R
 import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
-import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager
-import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter
-import com.udacity.sanketbhat.popularmovies.adapter.MovieLoadStateAdapter
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFragmentBinding
 import com.udacity.sanketbhat.popularmovies.model.SortOrder
+import com.udacity.sanketbhat.popularmovies.ui.views.MainGrid
 import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 
 class MovieListFragment : Fragment() {
     private lateinit var viewModel: MovieListViewModel
     private var mBinding: ActivityMovieListFragmentBinding? = null
-    private var gridLayoutManager: MovieGridLayoutManager? = null
-    private var adapter: MovieListAdapter? = null
-    private var movieRequestJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,35 +43,34 @@ class MovieListFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    @ExperimentalFoundationApi
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         setActivityTitle()
         val rootView = inflater.inflate(R.layout.activity_movie_list_fragment, container, false)
         mBinding = DataBindingUtil.bind(rootView)
-        mBinding?.let { mBinding ->
-            showMovieList()
-            setupRecyclerView(mBinding.movieList)
-            mBinding.movieListErrorRetryButton.setOnClickListener { adapter?.refresh() }
-            requestForMovies()
-        }
 
+        mBinding?.composeListView?.setContent {
+            val sortOrder by viewModel.sortOrder.observeAsState()
+            MainGrid(sortOrder, dataProvider = viewModel::getPagedMovies) {
+                (requireActivity() as? MovieClickListener)?.onClickItem(it)
+            }
+        }
         return rootView
     }
 
+
     private fun setActivityTitle() {
         if (activity != null) {
-            when (getPreferredSortOrder(activity!!.applicationContext)) {
-                SortOrder.SORT_ORDER_POPULAR -> activity!!.title = getString(R.string.title_popular_movie)
-                SortOrder.SORT_ORDER_TOP_RATED -> activity!!.title = getString(R.string.title_top_rated_movie)
-                else -> activity!!.setTitle(R.string.app_name)
-            }
-        }
-    }
-
-    private fun requestForMovies() {
-        movieRequestJob?.cancel()
-        movieRequestJob = lifecycleScope.launch {
-            viewModel.getPagedMovies(getPreferredSortOrder(context)).collectLatest {
-                adapter?.submitData(it)
+            when (getPreferredSortOrder(requireActivity().applicationContext)) {
+                SortOrder.SORT_ORDER_POPULAR -> requireActivity().title =
+                    getString(R.string.title_popular_movie)
+                SortOrder.SORT_ORDER_TOP_RATED -> requireActivity().title =
+                    getString(R.string.title_top_rated_movie)
+                else -> requireActivity().setTitle(R.string.app_name)
             }
         }
     }
@@ -92,8 +78,8 @@ class MovieListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_sort_popularity, R.id.menu_sort_rating -> {
-                adapter?.submitData(lifecycle, PagingData.empty())
-                requestForMovies()
+                viewModel.currentSortOrderLiveData.value =
+                    SortOrder.getSortOrderPath(getPreferredSortOrder(requireContext()))
                 setActivityTitle()
                 return true
             }
@@ -101,7 +87,7 @@ class MovieListFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView) {
+    /*private fun setupRecyclerView(recyclerView: RecyclerView) {
         //Initialize adapter with null movie items. Because it will be set once it is available
         adapter = MovieListAdapter(context!!, activity as MovieClickListener?)
 
@@ -114,38 +100,23 @@ class MovieListFragment : Fragment() {
         }
         lifecycleScope.launch {
             adapter?.loadStateFlow
-                    // Only emit when REFRESH LoadState for RemoteMediator changes.
-                    ?.distinctUntilChangedBy { it.refresh }
-                    // Only react to cases where Remote REFRESH completes i.e., NotLoading.
-                    ?.filter { it.refresh is LoadState.NotLoading }
-                    ?.collect { mBinding?.movieList?.scrollToPosition(0) }
+                // Only emit when REFRESH LoadState for RemoteMediator changes.
+                ?.distinctUntilChangedBy { it.refresh }
+                // Only react to cases where Remote REFRESH completes i.e., NotLoading.
+                ?.filter { it.refresh is LoadState.NotLoading }
+                ?.collect { mBinding?.movieList?.scrollToPosition(0) }
         }
 
-        val footerAdapter = MovieLoadStateAdapter{adapter?.retry()}
+        val footerAdapter = MovieLoadStateAdapter { adapter?.retry() }
         adapter?.addLoadStateListener { loadState -> footerAdapter.loadState = loadState.append }
-        val concatAdapter = ConcatAdapter(ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),adapter, footerAdapter);
+        val concatAdapter = ConcatAdapter(
+            ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
+            adapter,
+            footerAdapter
+        );
         recyclerView.adapter = concatAdapter
         gridLayoutManager = MovieGridLayoutManager(context!!, recyclerView.adapter!!)
         recyclerView.layoutManager = gridLayoutManager
         recyclerView.setHasFixedSize(true)
-    }
-
-    //Helper methods for showing three different layouts list, loading, error.
-    private fun showMovieList() {
-        mBinding?.movieList?.visibility = View.VISIBLE
-        mBinding?.movieLoadProgress?.visibility = View.GONE
-        mBinding?.movieListErrorLayout?.visibility = View.GONE
-    }
-
-    private fun showMovieLoading() {
-        mBinding?.movieList?.visibility = View.GONE
-        mBinding?.movieLoadProgress?.visibility = View.VISIBLE
-        mBinding?.movieListErrorLayout?.visibility = View.GONE
-    }
-
-    private fun showErrorLayout() {
-        mBinding?.movieList?.visibility = View.GONE
-        mBinding?.movieLoadProgress?.visibility = View.GONE
-        mBinding?.movieListErrorLayout?.visibility = View.VISIBLE
-    }
+    }*/
 }

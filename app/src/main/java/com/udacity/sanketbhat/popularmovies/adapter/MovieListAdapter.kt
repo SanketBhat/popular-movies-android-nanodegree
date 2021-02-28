@@ -117,7 +117,7 @@ class MovieListAdapter(
 
         override fun onClick(v: View) {
             getItem(bindingAdapterPosition)?.let {
-                clickListener?.onClickItem(v, it)
+                //clickListener?.onClickItem(v, it)
             }
 
         }

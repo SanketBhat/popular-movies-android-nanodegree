@@ -20,18 +20,14 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import com.udacity.sanketbhat.popularmovies.R
 import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
-import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager
-import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFavoritesBinding
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import com.udacity.sanketbhat.popularmovies.ui.views.FavoritesGrid
 
 class MovieListFavoritesFragment : Fragment() {
     private lateinit var viewModel: MovieListViewModel
@@ -43,28 +39,19 @@ class MovieListFavoritesFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        if (activity != null) activity!!.title = "Favorites"
+    @ExperimentalFoundationApi
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        if (activity != null) requireActivity().title = "Favorites"
         // Inflate the layout for this fragment
         val rootView = inflater.inflate(R.layout.activity_movie_list_favorites, container, false)
         val mBinding: ActivityMovieListFavoritesBinding? = DataBindingUtil.bind(rootView)
-        if (mBinding != null) {
-            val adapter = MovieListAdapter(context!!, activity as MovieClickListener?)
-            val gridLayoutManager = MovieGridLayoutManager(context!!, adapter)
-            mBinding.favoritesMovieList.layoutManager = gridLayoutManager
-            mBinding.favoritesMovieList.adapter = adapter
-            lifecycleScope.launch {
-                viewModel.getAllFavorites().collectLatest {
-                    adapter.submitData(it)
-                }
-            }
-            adapter.addLoadStateListener { loadState ->
-                mBinding.emptyFavoritesTextView.visibility = if (loadState.refresh is LoadState.NotLoading) {
-                    if (adapter.itemCount == 0) View.VISIBLE
-                    else View.GONE
-                } else {
-                    View.GONE
+        mBinding?.let {
+            it.favoritesComposeView.setContent {
+                FavoritesGrid(dataProvider = viewModel::getAllFavorites) {
+                    (requireActivity() as? MovieClickListener)?.onClickItem(it)
                 }
             }
         }
