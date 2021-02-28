@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <bool name="isTablet">false</bool>
     <dimen name="app_bar_height">200dp</dimen>
     <!--50% of app_bar_height"-->
     <dimen name="movie_detail_backdrop_scrim_height">100dp</dimen>

@@ -18,6 +18,7 @@ package com.udacity.sanketbhat.popularmovies.adapter
 import android.content.Context
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
 /**
  * The grid layout manager that dynamically set the span size of the items
@@ -30,10 +31,13 @@ class MovieGridLayoutManager(context: Context, adapter: RecyclerView.Adapter<Rec
         //Calculate device width dynamically
         val metrics = mContext.resources.displayMetrics
         val width = metrics.widthPixels / metrics.density
-
-        //If width is more than 720dp, its twoPane layout
+        val isTablet = mContext.resources.getBoolean(R.bool.isTablet)
+        //If its a tablet its master-detail layout
         //And it can have at most 2 item per row
-        return if (width >= TWO_PANE_MINIMUM_SIZE) TWO_PANE_SPAN_SIZE else width.toInt() / SINGLE_GRID_ITEM_WIDTH
+        return if (isTablet)
+            TWO_PANE_SPAN_SIZE
+        else
+            width.toInt() / SINGLE_GRID_ITEM_WIDTH
 
         //If not twoPane layout, calculate calculate span size
         //160 is the fixed width for a single movie item.
@@ -52,7 +56,6 @@ class MovieGridLayoutManager(context: Context, adapter: RecyclerView.Adapter<Rec
     companion object {
         private const val SINGLE_GRID_ITEM_WIDTH = 160
         private const val TWO_PANE_SPAN_SIZE = 2
-        private const val TWO_PANE_MINIMUM_SIZE = 720
     }
 
     init {
