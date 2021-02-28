@@ -23,12 +23,15 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import com.udacity.sanketbhat.popularmovies.R
 import com.udacity.sanketbhat.popularmovies.adapter.MovieClickListener
 import com.udacity.sanketbhat.popularmovies.adapter.MovieGridLayoutManager
 import com.udacity.sanketbhat.popularmovies.adapter.MovieListAdapter
 import com.udacity.sanketbhat.popularmovies.databinding.ActivityMovieListFavoritesBinding
-import com.udacity.sanketbhat.popularmovies.model.Movie
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MovieListFavoritesFragment : Fragment() {
     private lateinit var viewModel: MovieListViewModel
@@ -47,14 +50,23 @@ class MovieListFavoritesFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.activity_movie_list_favorites, container, false)
         val mBinding: ActivityMovieListFavoritesBinding? = DataBindingUtil.bind(rootView)
         if (mBinding != null) {
-            val adapter = MovieListAdapter(context!!, null, activity as MovieClickListener?)
+            val adapter = MovieListAdapter(context!!, activity as MovieClickListener?)
             val gridLayoutManager = MovieGridLayoutManager(context!!, adapter)
             mBinding.favoritesMovieList.layoutManager = gridLayoutManager
             mBinding.favoritesMovieList.adapter = adapter
-            viewModel.favorites?.observe(viewLifecycleOwner, { movies: List<Movie>? ->
-                adapter.swapMovies(movies)
-                if (movies != null && movies.isNotEmpty()) mBinding.emptyFavoritesTextView.visibility = View.GONE else mBinding.emptyFavoritesTextView.visibility = View.VISIBLE
-            })
+            lifecycleScope.launch {
+                viewModel.getAllFavorites().collectLatest {
+                    adapter.submitData(it)
+                }
+            }
+            adapter.addLoadStateListener { loadState ->
+                mBinding.emptyFavoritesTextView.visibility = if (loadState.refresh is LoadState.NotLoading) {
+                    if (adapter.itemCount == 0) View.VISIBLE
+                    else View.GONE
+                } else {
+                    View.GONE
+                }
+            }
         }
         return rootView
     }

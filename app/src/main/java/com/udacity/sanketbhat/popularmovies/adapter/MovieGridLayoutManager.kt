@@ -17,32 +17,37 @@ package com.udacity.sanketbhat.popularmovies.adapter
 
 import android.content.Context
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.sanketbhat.popularmovies.R
 
 /**
  * The grid layout manager that dynamically set the span size of the items
  * In the two pane layout, the items per a row is limit to 2. and in single
  * pane layout it is dynamically calculated using the screen width and item width
  */
-class MovieGridLayoutManager(context: Context, adapter: MovieListAdapter) : GridLayoutManager(context, 1, VERTICAL, false) {
+class MovieGridLayoutManager(context: Context, adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>) : GridLayoutManager(context, 1, VERTICAL, false) {
     private val movieItemSpanCount: Int
     private fun getCustomSpanCount(mContext: Context): Int {
         //Calculate device width dynamically
         val metrics = mContext.resources.displayMetrics
         val width = metrics.widthPixels / metrics.density
-
-        //If width is more than 720dp, its twoPane layout
+        val isTablet = mContext.resources.getBoolean(R.bool.isTablet)
+        //If its a tablet its master-detail layout
         //And it can have at most 2 item per row
-        return if (width >= TWO_PANE_MINIMUM_SIZE) TWO_PANE_SPAN_SIZE else width.toInt() / SINGLE_GRID_ITEM_WIDTH
+        return if (isTablet)
+            TWO_PANE_SPAN_SIZE
+        else
+            width.toInt() / SINGLE_GRID_ITEM_WIDTH
 
         //If not twoPane layout, calculate calculate span size
         //160 is the fixed width for a single movie item.
     }
 
-    internal inner class MovieSpanSizeLookup(private val mAdapter: MovieListAdapter) : SpanSizeLookup() {
+    internal inner class MovieSpanSizeLookup(private val mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>) : SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
             return when (mAdapter.getItemViewType(position)) {
-                MovieListAdapter.Companion.VIEW_TYPE_PROGRESS -> movieItemSpanCount
-                MovieListAdapter.Companion.VIEW_TYPE_MOVIE -> 1
+                MovieListAdapter.VIEW_TYPE_PROGRESS -> movieItemSpanCount
+                MovieListAdapter.VIEW_TYPE_MOVIE -> 1
                 else -> 1
             }
         }
@@ -51,7 +56,6 @@ class MovieGridLayoutManager(context: Context, adapter: MovieListAdapter) : Grid
     companion object {
         private const val SINGLE_GRID_ITEM_WIDTH = 160
         private const val TWO_PANE_SPAN_SIZE = 2
-        private const val TWO_PANE_MINIMUM_SIZE = 720
     }
 
     init {

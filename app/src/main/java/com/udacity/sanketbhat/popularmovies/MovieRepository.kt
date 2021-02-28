@@ -17,10 +17,11 @@ package com.udacity.sanketbhat.popularmovies
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import com.udacity.sanketbhat.popularmovies.api.TheMovieDBApiService
 import com.udacity.sanketbhat.popularmovies.database.MovieDao
 import com.udacity.sanketbhat.popularmovies.model.Movie
-import com.udacity.sanketbhat.popularmovies.model.PageResponse
 import com.udacity.sanketbhat.popularmovies.model.ReviewResponse
 import com.udacity.sanketbhat.popularmovies.model.VideoResponse
 import retrofit2.Call
@@ -41,16 +42,17 @@ class MovieRepository private constructor(context: Context) {
         service = Dependencies.theMovieDBApiService
     }
 
-    fun getNextPage(sortOrder: String?, position: Int, responseCallback: Callback<PageResponse?>?) {
-        service.getPage(sortOrder, position)?.enqueue(responseCallback)
-    }
+    fun getPagedMovies(sortOrder: String) = Pager(
+            PagingConfig(MOVIE_PAGE_SIZE, enablePlaceholders = false, initialLoadSize = 20)
+    ) {
+        MoviePagingSource(service, sortOrder)
+    }.flow
 
-    fun getFirstPage(sortOrder: String?, responseCallBack: Callback<PageResponse?>?) {
-        service.getFirstPage(sortOrder)?.enqueue(responseCallBack)
-    }
-
-    val favorites: LiveData<List<Movie>>
-        get() = movieDao.allMovies
+    fun getAllFavorites() = Pager(
+            config = PagingConfig(pageSize = MOVIE_PAGE_SIZE, enablePlaceholders = false)
+    ) {
+        movieDao.allMovies()
+    }.flow
 
     fun isFavorite(id: Int): LiveData<Movie> {
         return movieDao.isFavorite(id)
@@ -128,11 +130,11 @@ class MovieRepository private constructor(context: Context) {
 
         //Singleton
         @JvmStatic
-        fun getInstance(context: Context): MovieRepository? {
+        fun getInstance(context: Context): MovieRepository {
             if (movieRepository == null) {
                 synchronized(LOCK) { movieRepository = MovieRepository(context) }
             }
-            return movieRepository
+            return movieRepository!!
         }
     }
 }
