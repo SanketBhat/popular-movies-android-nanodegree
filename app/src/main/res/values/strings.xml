@@ -27,9 +27,9 @@
     <string name="movie_detail_backdrop_image_description">Backdrop image</string>
     <string name="movie_detail_release_date_label">Release Date</string>
     <string name="movie_detail_average_rating_label">Average rating</string>
-    <string name="movie_detail_plot_label">Synopsis</string>
+    <string name="movie_detail_plot_label">Overview</string>
     <string name="movie_detail_average_rating_string">(%.1f/5.0)</string>
-    <string name="movie_detail_trailers_label">Trailers</string>
+    <string name="movie_detail_trailers_label">Videos</string>
     <string name="movie_detail_review_label">Reviews</string>
     <string name="movie_details_video_description">Movie Video/Trailer</string>
     <string name="movie_details_video_play_button">Play Button</string>
@@ -61,5 +61,6 @@
     <string name="menu_share">Share</string>
     <string name="share_text_template">Here is an awesome movie I found, watch the trailer %s .Explore popular movies list using app \'Pop Moviez\' :)</string>
     <string name="movie_detail_show_more"><![CDATA[Show More>]]></string>
+    <string name="fab_content_description">Add to favorites</string>
 
 </resources>
