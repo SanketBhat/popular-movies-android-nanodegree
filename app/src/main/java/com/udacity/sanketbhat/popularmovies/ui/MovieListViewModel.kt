@@ -25,18 +25,23 @@ import androidx.paging.cachedIn
 import com.udacity.sanketbhat.popularmovies.MovieRepository.Companion.getInstance
 import com.udacity.sanketbhat.popularmovies.model.Movie
 import com.udacity.sanketbhat.popularmovies.model.SortOrder
-import com.udacity.sanketbhat.popularmovies.util.PreferenceUtils.getPreferredSortOrder
+import com.udacity.sanketbhat.popularmovies.ui.views.AppScreen
 import kotlinx.coroutines.flow.Flow
 
 //Accessed by android library
 class MovieListViewModel(application: Application?) : AndroidViewModel(application!!) {
 
     private var repo = getInstance(getApplication<Application>().applicationContext)
-    var currentSortOrderLiveData = MutableLiveData<String?>(null)
-    val sortOrder: LiveData<String?> = currentSortOrderLiveData
-    var currentSortOrder: String? = null
-    private var currentMovieResult: Flow<PagingData<Movie>>? = null
+    private val _currentScreen = MutableLiveData<AppScreen>()
+    val currentScreen: LiveData<AppScreen> = _currentScreen
+    private var currentPopularMovieResult: Flow<PagingData<Movie>>? = null
+    private var currentTopRatedMovieResult: Flow<PagingData<Movie>>? = null
     private var favoriteMovieList: Flow<PagingData<Movie>>? = null
+    var showCreditsDialog = MutableLiveData(false)
+
+    fun setCurrentScreen(screen: AppScreen) {
+        _currentScreen.value = screen
+    }
 
     fun getAllFavorites(): Flow<PagingData<Movie>> {
         favoriteMovieList?.let {
@@ -47,16 +52,23 @@ class MovieListViewModel(application: Application?) : AndroidViewModel(applicati
         return newList
     }
 
-    fun getPagedMovies(sortOrder: String?): Flow<PagingData<Movie>> {
-        val newSortOrder =
-            sortOrder ?: SortOrder.getSortOrderPath(getPreferredSortOrder(getApplication()))
-        val lastResult = currentMovieResult
-        if (newSortOrder == currentSortOrder && lastResult != null) {
+    fun getPopularMovies(): Flow<PagingData<Movie>> {
+        val lastResult = currentPopularMovieResult
+        if (lastResult != null) {
             return lastResult
         }
-        currentSortOrder = newSortOrder
-        val newResult = repo.getPagedMovies(newSortOrder).cachedIn(viewModelScope)
-        currentMovieResult = newResult
+        val newResult = repo.getPagedMovies(SortOrder.URL_PATH_POPULAR).cachedIn(viewModelScope)
+        currentPopularMovieResult = newResult
+        return newResult
+    }
+
+    fun getTopRatedMovies(): Flow<PagingData<Movie>> {
+        val lastResult = currentTopRatedMovieResult
+        if (lastResult != null) {
+            return lastResult
+        }
+        val newResult = repo.getPagedMovies(SortOrder.URL_PATH_TOP_RATED).cachedIn(viewModelScope)
+        currentTopRatedMovieResult = newResult
         return newResult
     }
 }

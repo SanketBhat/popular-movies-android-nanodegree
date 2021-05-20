@@ -66,8 +66,9 @@ abstract class RecyclerViewAdapterTemplate<VH : RecyclerView.ViewHolder?, T> int
     override fun onBindViewHolder(holder: VH, position: Int) {
         if (getItemViewType(position) == VIEW_TYPE_NORMAL) {
             try {
-                val viewHolder = holder //Handling cast exception.
-                normalBinding(viewHolder, position)
+                normalBinding(
+                    holder, position
+                )
             } catch (e: ClassCastException) {
                 e.printStackTrace()
             }

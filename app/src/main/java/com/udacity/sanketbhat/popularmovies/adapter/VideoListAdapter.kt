@@ -31,7 +31,7 @@ class VideoListAdapter(private val mContext: Context, private val clickListener:
 
     override fun normalBinding(holder: VideoListViewHolder, position: Int) {
         var video = contents!![position] as Video
-        Picasso.with(mContext)
+        Picasso.get()
                 .load(String.format(Locale.getDefault(), YOUTUBE_THUMBNAIL_TEMPLATE, video.key))
                 .into(holder.videoThumbnail)
         if (video.site.equals(YOUTUBE_VIDEO_SOURCE, ignoreCase = true))

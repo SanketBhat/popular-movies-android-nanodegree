@@ -17,7 +17,7 @@ package com.udacity.sanketbhat.popularmovies.ui
 
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.squareup.picasso.Picasso
@@ -52,7 +52,7 @@ class MovieDetailActivity : AppCompatActivity() {
         val movie: Movie? = intent.getParcelableExtra(MovieDetailFragment.ARG_ITEM)
         if (movie != null) {
             //Load backdrop image.
-            Picasso.with(this)
+            Picasso.get()
                     .load(getBackdropUrlString(movie.backdropPath))
                     .into(mBinding.imageBackdrop)
             mBinding.toolbarLayout.title = movie.title

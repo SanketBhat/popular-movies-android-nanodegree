@@ -49,8 +49,8 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
         useIR = true
+        jvmTarget = '1.8'
     }
 
     composeOptions {
@@ -68,7 +68,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -88,10 +88,15 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling:$composeVersion"
     // Material Design
     implementation "androidx.compose.material:material:$composeVersion"
-    implementation "androidx.activity:activity-compose:1.3.0-alpha03"
+    implementation 'androidx.activity:activity-compose:1.3.0-alpha07'
     // Integration with observables
     implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.6.1"
+    implementation "dev.chrisbanes.accompanist:accompanist-picasso:0.6.1"
+    implementation('androidx.fragment:fragment') {
+        version {
+            strictly '1.2.0'
+        }
+    }
 }
 repositories {
     mavenCentral()

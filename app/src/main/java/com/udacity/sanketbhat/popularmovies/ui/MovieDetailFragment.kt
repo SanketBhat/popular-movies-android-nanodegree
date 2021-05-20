@@ -18,7 +18,6 @@ package com.udacity.sanketbhat.popularmovies.ui
 import android.animation.LayoutTransition
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -72,7 +71,7 @@ class MovieDetailFragment
         val rootView = inflater.inflate(R.layout.activity_movie_detail_content, container, false)
         val mBinding: ActivityMovieDetailContentBinding? = DataBindingUtil.bind(rootView)
         rootView.viewTreeObserver.addOnPreDrawListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && activity != null && activity!!.javaClass == MovieDetailActivity::class.java) {
+            if (activity != null && activity!!.javaClass == MovieDetailActivity::class.java) {
                 //Start shared transition on Lollipop and higher devices.
                 activity!!.startPostponedEnterTransition()
             }
@@ -81,7 +80,7 @@ class MovieDetailFragment
         (rootView as ConstraintLayout).layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         if (movie != null && mBinding != null && context != null) {
             //Loading views with data
-            Picasso.with(context)
+            Picasso.get()
                     .load(getPosterUrlString(movie!!.posterPath))
                     .error(R.drawable.ic_movie_grid_item_image_error)
                     .into(mBinding.movieDetailPoster)

@@ -19,8 +19,9 @@ object SortOrder {
     const val SORT_ORDER_POPULAR = 1
     const val SORT_ORDER_TOP_RATED = 2
     const val SORT_ORDER_DEFAULT = SORT_ORDER_POPULAR
-    private const val URL_PATH_POPULAR = "popular"
-    private const val URL_PATH_TOP_RATED = "top_rated"
+    const val URL_PATH_POPULAR = "popular"
+    const val URL_PATH_TOP_RATED = "top_rated"
+
     @kotlin.jvm.JvmStatic
     fun getSortOrderPath(sortOrder: Int): String {
         return when (sortOrder) {
