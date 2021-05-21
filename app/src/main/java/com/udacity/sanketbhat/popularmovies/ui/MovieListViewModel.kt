@@ -16,6 +16,10 @@
 package com.udacity.sanketbhat.popularmovies.ui
 
 import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,6 +42,11 @@ class MovieListViewModel(application: Application?) : AndroidViewModel(applicati
     private var currentTopRatedMovieResult: Flow<PagingData<Movie>>? = null
     private var favoriteMovieList: Flow<PagingData<Movie>>? = null
     var showCreditsDialog = MutableLiveData(false)
+    val screens = listOf(
+        AppScreen("Popular", Icons.Default.Star, this::getPopularMovies),
+        AppScreen("Top Rated", Icons.Default.ThumbUp, this::getTopRatedMovies),
+        AppScreen("Favorites", Icons.Default.Favorite, this::getAllFavorites)
+    )
 
     fun setCurrentScreen(screen: AppScreen) {
         _currentScreen.value = screen

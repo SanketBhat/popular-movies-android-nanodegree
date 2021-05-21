@@ -21,10 +21,6 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.ViewModelProvider
@@ -50,16 +46,11 @@ class MovieListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MovieListViewModel::class.java)
         mTwoPane = resources.getBoolean(R.bool.isTablet)
-        val screens = listOf(
-            AppScreen("Popular", Icons.Default.Star, viewModel::getPopularMovies),
-            AppScreen("Top Rated", Icons.Default.ThumbUp, viewModel::getTopRatedMovies),
-            AppScreen("Favorites", Icons.Default.Favorite, viewModel::getAllFavorites)
-        )
         setContent {
-            val currentScreen by viewModel.currentScreen.observeAsState(screens[0])
+            val currentScreen by viewModel.currentScreen.observeAsState(viewModel.screens[0])
             val showCredits by viewModel.showCreditsDialog.observeAsState(initial = false)
             PopMoviesTheme {
-                AppScaffold(currentScreen, screens, viewModel) {
+                AppScaffold(currentScreen, viewModel.screens, viewModel) {
                     if (mTwoPane) {
                         TwoPaneLayout(currentScreen, this::onClickItem)
                     } else {
